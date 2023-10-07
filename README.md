@@ -74,3 +74,4 @@ This will create a single binary in the build directory that, when excecuted, wi
  - [ ] bring back the analyses
  - [ ] textures as shader inputs and -targets
 
+![tectogen logo](doc/logo.svg)
