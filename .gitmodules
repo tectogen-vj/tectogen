@@ -1,0 +1,18 @@
+[submodule "ext/imgui"]
+	path = ext/imgui
+	url = https://github.com/ocornut/imgui
+[submodule "ext/libsoundio"]
+	path = ext/libsoundio
+	url = https://github.com/andrewrk/libsoundio
+[submodule "ext/jet-live"]
+	path = ext/jet-live
+	url = https://github.com/ddovod/jet-live
+[submodule "ext/dmon"]
+	path = ext/dmon
+	url = https://github.com/septag/dmon
+[submodule "ext/visit_struct"]
+	path = ext/visit_struct
+	url = https://github.com/cbeck88/visit_struct
+[submodule "ext/imnodes"]
+	path = ext/imnodes
+	url = https://github.com/Nelarius/imnodes

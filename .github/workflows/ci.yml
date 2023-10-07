@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-20.04
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: true
+#    - name: Install build dependencies
+#      run: |
+#        sudo apt update
+#        sudo apt install -y --no-install-recommends cmake clang libfftw3-dev libglfw3-dev ninja-build libglew-dev libwayland-dev libx11-dev libxrandr-dev libxxf86vm-dev libxcursor-dev libxinerama-dev libxi-dev libglm-dev
+
+    - uses: awalsh128/cache-apt-pkgs-action@latest
+      with:
+        packages: cmake clang libfftw3-dev libglfw3-dev ninja-build libglew-dev libwayland-dev libx11-dev libxrandr-dev libxxf86vm-dev libxcursor-dev libxinerama-dev libxi-dev libglm-dev
+        version: 1.0
+
+    - name: Build project
+      run: |
+        mkdir build
+        cd build
+        cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -GNinja ..
+        ninja
