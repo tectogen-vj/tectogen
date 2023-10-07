@@ -2,7 +2,18 @@
 
 tectogen is an experimental graphical application to live-code, combine and music-match visual effects, provided in the form of GLSL fragment shader functions. All of this is currently in pre-alpha/tech demo stage.
 
-![Screenshot of the current, minimalistic test pipeline](doc/screenshot.png)
+## Contents
+
+ - [Screenshot](#screenshot)
+ - [Project Description](#project-description)
+ - [Prerequisites](#prerequisites)
+ - [Building](#building)
+ - [TODO](#todo)
+ - [Logo](#logo)
+
+## Screenshot
+
+![old screenshot of the minimalistic test pipeline](doc/screenshot.png)
 
 ## Project Description
 
@@ -29,9 +40,7 @@ To ensure that operations such as rebuilding or relinking the GLSL shaders does 
  - shader compilation
  - initially receiving audio into fixed-size buffers
 
-## Getting started
-
-### Prerequisites
+## Prerequisites
 
 tectogen is developed in C++ with portability in mind, the tech demo currently targets OpenGL 3.2 core. While linux, particularly arch linux, as my daily driver is most supported, compatibility with Ubuntu 20.04 is regularly verified.
 
@@ -39,7 +48,7 @@ Past revisions of this codebas have been verified to work well on Windows, build
 
 All dependencies should be Mac OS compatible.
 
-### Building
+## Building
 
 Like everything in tectogen, the build flow was set up in a "works for me" manner. Please open an issue for any inconveniences you encounter.
 
@@ -73,5 +82,7 @@ This will create a single binary in the build directory that, when excecuted, wi
  - [ ] band filtering
  - [ ] bring back the analyses
  - [ ] textures as shader inputs and -targets
+
+## Logo
 
 ![tectogen logo](doc/logo.svg)
