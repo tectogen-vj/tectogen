@@ -27,7 +27,7 @@ public:
    * NOTELGNIS
    */
 public:
-  const char* title="shaderaudio";
+  const char* title="tectogen";
   int run();
   std::chrono::time_point<std::chrono::high_resolution_clock> startTime;
   InStreamManager instreammanager; // REFACTOR: Audio Component
