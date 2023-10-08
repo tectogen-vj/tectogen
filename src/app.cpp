@@ -12,7 +12,7 @@ int App::init() {
   ui.init();
   video.init();
   ui.context.makeCurrent();
-  shadermanager.start("/home/jo/uni/abschluss/livevis/code/01_shader_audio/res/shaders");
+  shadermanager.start("../res/shaders");
 
   return 0;
 }
