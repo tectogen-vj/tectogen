@@ -31,9 +31,14 @@ void ShaderManager::start(std::string path) {
     }
   this->path=path;
   Logs::get().logf(logSeverity_Info, "Shader", "Enumerating shaders in %s", path.c_str());
-  for (const auto& file : std::filesystem::directory_iterator(path)) {
-     reloadFile(file);
+  try {
+    for (const auto& file : std::filesystem::directory_iterator(path)) {
+      reloadFile(file);
     }
+  } catch(std::filesystem::filesystem_error err) {
+    Logs::get().logf(logSeverity_Err, "Shader", "Could not open directory '%s'", path.c_str());
+    return;
+  }
   dmon_init();
   dmon_watch(path.c_str(), [](dmon_watch_id watch_id, dmon_action action, const char* rootdir,
              const char* filepath, const char* oldfilepath, void* user){
@@ -41,11 +46,11 @@ void ShaderManager::start(std::string path) {
       Logs::get().logf(logSeverity_Info, "Shader", "file changed %s | %s",filepath, oldfilepath);
       if(filepath) {
           // HACK
-          t->reloadFile(std::filesystem::path(t->path) / filepath);
+          t->reloadFile(t->path / filepath);
         }
       if(oldfilepath) {
           // HACK
-          t->reloadFile(std::filesystem::path(t->path) / oldfilepath);
+          t->reloadFile(t->path / oldfilepath);
         }
     }
   , DMON_WATCHFLAGS_RECURSIVE, this);
@@ -110,7 +115,11 @@ void ShaderManager::link() {
 }
 
 void ShaderManager::reloadFile(const std::string file) {
-  reloadFile(std::filesystem::directory_entry(file));
+  try {
+    reloadFile(std::filesystem::directory_entry(file));
+  } catch (...) {
+    Logs::get().logf(logSeverity_Err,"Shader", "Failed to reload %s", file.c_str());
+  }
 }
 
 void ShaderManager::reloadFile(const std::filesystem::directory_entry file) {

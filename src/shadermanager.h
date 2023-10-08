@@ -31,7 +31,7 @@ public:
   void start(std::string path);
   void shutdown();
   void link();
-  std::string path;
+  std::filesystem::path path;
   void reloadFile(std::string file);
   void reloadFile(std::filesystem::directory_entry file);
   std::shared_ptr<ShaderProgram> getProgram();
