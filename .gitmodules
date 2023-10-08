@@ -16,3 +16,5 @@
 [submodule "ext/imnodes"]
 	path = ext/imnodes
 	url = https://github.com/Nelarius/imnodes
+[submodule "dmon"]
+	url = https://github.com/krumelmonster/dmon.git
