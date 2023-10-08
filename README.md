@@ -8,7 +8,8 @@ tectogen is an experimental graphical application to live-code, combine and musi
  - [Project Description](#project-description)
  - [Prerequisites](#prerequisites)
  - [Building](#building)
- - [TODO](#todo)
+ - [Contributing and Feedback](#contributing-and-feedback)
+ - [Roadmap](#roadmap)
  - [Logo](#logo)
 
 ## Screenshot
@@ -72,7 +73,18 @@ cmake --build build
 
 This will create a single binary in the build directory that, when excecuted, will search for a `shader` directory in the current path containing .frag files with the shader functions (try those from the `ext` directory) and will create an `imgui.ini` holding not only `imgui`s window/dock state and such but also some state of tectogen itself.
 
-## TODO
+## Contributing and Feedback
+
+tectogen is in a very early stage of develoment, yet any feedback is welcome. Please create a [codeberg issue](https://codeberg.org/tectogen/tectogen/issues) for:
+
+ - Any inconvenience you encounter when trying to build, test or understand the codebase
+ - Any questions that are left unanswered by this README
+ - Feature requests, even the far fetched ones. Now is the perfect time to discuss future prospects
+ - Bugs! I'll try file the ones I know of myself
+
+I will try to define milestones based on the issues in the tracker.
+
+## Roadmap
 
  - [ ] merge multiple shaders
  - [ ] coordinate system shaders
