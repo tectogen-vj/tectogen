@@ -68,6 +68,8 @@ set(CLASSES
 
   shadernodeprogram
   monitoringwindow
+
+  uitheme
 )
 
 set(HEADER

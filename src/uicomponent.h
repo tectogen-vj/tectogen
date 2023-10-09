@@ -2,6 +2,7 @@
 
 #include "context.h"
 #include "nodewindow.h"
+#include "uitheme.h"
 
 #ifdef USE_JET_LIVE
 #include "jettools.h"
@@ -26,6 +27,7 @@ class UIComponent
   AudioConfigWindow audioConfigWindow;
   MonitoringWindow monitoringWindow;
   NodeWindow nodeWindow;
+  UITheme theme;
   GLuint vertex_buffer;
   bool show_app_stack_tool=false;
 #ifdef USE_JET_LIVE

@@ -157,7 +157,7 @@ void InStreamManager::analysisThreadFunc() {
           DisplayPayload* dp=(DisplayPayload*)disp.getProgramState()->userdata;
           video.bindPreview(dp->renderTex.beginWrite());
 
-          glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+          glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
           glUseProgram(dp->inv.program);
 
           glBindVertexArray(video.vertex_array);

@@ -55,9 +55,6 @@ int UIComponent::init() {
 
   initialRun = !imContext.SettingsLoaded;
 
-  ImGui::StyleColorsDark();
-
-
   ImGui_ImplGlfw_InitForOpenGL(context.window, true);
 
   if(context.ogl_major==0 || context.ogl_major==2) {
@@ -80,6 +77,8 @@ int UIComponent::init() {
   audioConfigWindow.init();
   nodeWindow.init();
   monitoringWindow.init();
+
+  theme.set();
 
   return 0;
 }
@@ -180,7 +179,7 @@ int UIComponent::tick() {
   glfwGetFramebufferSize(context.window, &display_w, &display_h);
   glViewport(0, 0, display_w, display_h);
 
-  glClearColor(0.2f, 0.2f, 0.2f, 1);
+  glClearColor(theme.ClearColor.x, theme.ClearColor.y, theme.ClearColor.z, theme.ClearColor.w);
 
   glClear(GL_COLOR_BUFFER_BIT);
 
