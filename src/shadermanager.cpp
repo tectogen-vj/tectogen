@@ -16,6 +16,7 @@ ShaderManager::ShaderManager(): vertex_shader(GL_VERTEX_SHADER, Shader::vertex_s
 int ShaderManager::init()
 {
   context.createBackground();
+  dmon_init();
   this->shaderReloadThread=std::thread([this](){
     context.makeCurrent();
     // TODO: fully move vertex shader into ShaderManager?
@@ -44,7 +45,6 @@ void ShaderManager::watch(std::string path) {
     Logs::get().logf(logSeverity_Err, "Shader", "Could not open directory '%s'", path.c_str());
     return;
   }
-  dmon_init();
   dmon_watch(path.c_str(), [](dmon_watch_id watch_id, dmon_action action, const char* rootdir,
              const char* filepath, const char* oldfilepath, void* user){
       ShaderManager* t=(ShaderManager*)user;
@@ -66,7 +66,6 @@ void ShaderManager::shutdown() {
   if(_dmon_init) {
     dmon_deinit();
   }
-  currentProgram=nullptr;
   shaderfiles.clear();
   terminate=true;
   shaderChangeCV.notify_one();
@@ -85,36 +84,6 @@ void ShaderManager::link() {
       Logs::get().logf(logSeverity_Debug, "Shader", "Shader compiled %s", pair.first.c_str());
       // TODO: CHeck for error
       changed=true;
-    }
-  }
-  if(!changed) {
-      return;
-    }
-  nextProgram = glCreateProgram();
-  glAttachShader(nextProgram, vertex_shader);
-  for (const auto& pair : shaderfiles) {
-    glAttachShader(nextProgram, pair.second.shader);
-  }
-
-  glLinkProgram(nextProgram);
-  GLint linkStatus;
-  glGetProgramiv(nextProgram, GL_LINK_STATUS, &linkStatus);
-  if (linkStatus == GL_TRUE) {
-    // TODO: lock mutex here and in getProgram()
-    currentProgram=std::shared_ptr<ShaderProgram>(new ShaderProgram(nextProgram));
-
-    Logs::get().log(logSeverity_Info, "Shader", "Program linked");
-  } else {
-    GLint logLength;
-    glGetProgramiv(nextProgram, GL_INFO_LOG_LENGTH, &logLength);
-
-    if (logLength > 0) {
-      GLchar* infoLog = new GLchar[logLength];
-      glGetProgramInfoLog(nextProgram, logLength, NULL, infoLog);
-      Logs::get().logf(logSeverity_Err, "Shader", "Linkage failed: %s", infoLog);
-      delete[] infoLog;
-    } else {
-      Logs::get().log(logSeverity_Err, "Shader", "Linkage failed, no log available");
     }
   }
 }
@@ -146,6 +115,3 @@ void ShaderManager::reloadFile(const std::filesystem::directory_entry file) {
   }
 }
 
-std::shared_ptr<ShaderProgram> ShaderManager::getProgram() {
-  return currentProgram;
-}
