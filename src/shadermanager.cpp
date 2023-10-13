@@ -13,7 +13,8 @@
 ShaderManager::ShaderManager(): vertex_shader(GL_VERTEX_SHADER, Shader::vertex_shader_text) {
 }
 
-void ShaderManager::start(std::string path) {
+int ShaderManager::init()
+{
   context.createBackground();
   this->shaderReloadThread=std::thread([this](){
     context.makeCurrent();
@@ -25,6 +26,10 @@ void ShaderManager::start(std::string path) {
       shaderChangeCV.wait(lock);
     }
   });
+  return 0;
+}
+
+void ShaderManager::watch(std::string path) {
   if(!this->path.empty()) {
       Logs::get().log(logSeverity_Warn, "Shader", "Tried to initialize shadermanager twice, ignoring");
       return;

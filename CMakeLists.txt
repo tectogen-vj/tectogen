@@ -124,8 +124,10 @@ set(EXT_SOURCES
     ${IMGUI_DIR}/backends/imgui_impl_glfw.cpp
     )
 
-add_executable(${PROJECT_NAME} "")
-target_sources(${PROJECT_NAME}
+set(BINARY_TARGET "bin/${PROJECT_NAME}")
+
+add_executable(${BINARY_TARGET} "")
+target_sources(${BINARY_TARGET}
     PRIVATE
     ${SOURCES}
     ${EXT_SOURCES}
@@ -185,14 +187,14 @@ get_directory_property(SOUNDIO_STATIC_LIBNAME DIRECTORY ${EXTPATH_LIBSOUNDIO} DE
 IF (WIN32)
   set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
   set(THREADS_PREFER_PTHREAD_FLAG TRUE)
-  set_target_properties(${PROJECT_NAME} PROPERTIES LINK_SEARCH_START_STATIC 1)
-  set_target_properties(${PROJECT_NAME} PROPERTIES LINK_SEARCH_END_STATIC 1)
+  set_target_properties(${BINARY_TARGET} PROPERTIES LINK_SEARCH_START_STATIC 1)
+  set_target_properties(${BINARY_TARGET} PROPERTIES LINK_SEARCH_END_STATIC 1)
   set(CMAKE_FIND_LIBRARY_SUFFIXES ".a")
-  target_link_libraries(${PROJECT_NAME} -static-libgcc -static-libstdc++)
+  target_link_libraries(${BINARY_TARGET} -static-libgcc -static-libstdc++)
   find_package(Threads REQUIRED)
 
   #TODO: remove explicit references to static library files (above should suffice to link statically)
-  target_link_libraries(${PROJECT_NAME} PRIVATE
+  target_link_libraries(${BINARY_TARGET} PRIVATE
     libsoundio_static ${LIBSOUNDIO_LIBS}
     libglew32.a
     ${OPENGL_LIBRARIES}
@@ -201,7 +203,7 @@ IF (WIN32)
     ${LIBSOUNDIO_LIBS}
   )
 ELSE ()
-  target_link_libraries(${PROJECT_NAME} PRIVATE
+  target_link_libraries(${BINARY_TARGET} PRIVATE
     libsoundio_static
     ${GLEW_LIBRARIES}
     ${OPENGL_LIBRARIES}
@@ -213,7 +215,7 @@ ELSE ()
 ENDIF()
 
 
-target_include_directories(${PROJECT_NAME} PRIVATE
+target_include_directories(${BINARY_TARGET} PRIVATE
     ${OPENGL_INCLUDE_DIRS}
     ${GLFW_INCLUDE_DIRS}
     ${FFTW_INCLUDE_DIRS}
@@ -227,4 +229,9 @@ target_include_directories(${PROJECT_NAME} PRIVATE
      PRIVATE ${EXTPATH_VISIT_STRUCT}
 )
 
-target_compile_definitions(${PROJECT_NAME} PRIVATE IMGUI_IMPL_LOADER_GLEW)
+target_compile_definitions(${BINARY_TARGET} PRIVATE IMGUI_IMPL_LOADER_GLEW)
+
+file(GLOB SHADER_FILES
+  "res/shaders/*"
+)
+file(COPY ${SHADER_FILES} DESTINATION ${CMAKE_BINARY_DIR}/share/tectogen/shaders)

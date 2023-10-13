@@ -1,5 +1,5 @@
 #include "app.h"
 
-int main() {
-  App::get().run();
+int main(int argc, char** argv) {
+  App::get().run(argc, argv);
 }

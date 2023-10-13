@@ -3,6 +3,7 @@
 
 #include <cstdlib>
 #include <memory>
+#include <filesystem>
 
 int App::init() {
 
@@ -11,8 +12,11 @@ int App::init() {
 
   ui.init();
   video.init();
+  shadermanager.init();
+  std::filesystem::path bindir = std::filesystem::weakly_canonical(std::filesystem::path(argv[0])).parent_path();
+  shadermanager.watch(bindir.parent_path().append("share").append("tectogen").append("shaders"));
+
   ui.context.makeCurrent();
-  shadermanager.start("../res/shaders");
 
   return 0;
 }
@@ -37,7 +41,9 @@ App::App() {
   startTime = std::chrono::high_resolution_clock::now();
 }
 
-int App::run() {
+int App::run(int argc, char **argv) {
+  this->argc=argc;
+  this->argv=argv;
   init();
   Logs::get().log(logSeverity_Debug, "UI", "Initialization finished");
   tick();

@@ -28,7 +28,8 @@ private:
 public:
   std::map<std::string, FragmentShader> shaderfiles;
   ShaderManager();
-  void start(std::string path);
+  int init();
+  void watch(std::string path);
   void shutdown();
   void link();
   std::filesystem::path path;

@@ -28,7 +28,7 @@ public:
    */
 public:
   const char* title="tectogen";
-  int run();
+  int run(int argc, char** argv);
   std::chrono::time_point<std::chrono::high_resolution_clock> startTime;
   InStreamManager instreammanager; // REFACTOR: Audio Component
   ShaderManager shadermanager;
@@ -42,4 +42,6 @@ private:
   int tick();
   int shutdown();
 
+  int argc;
+  char** argv;
 };
