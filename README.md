@@ -18,11 +18,11 @@ tectogen is an experimental graphical application to live-code, combine and musi
 
 ## Project Description
 
-The core of tectogen's user interface is a node editor consuming sample audio as external input and screens on which to render the resulting fragment shader as external outputs.
+The core of tectogen's user interface is a node editor that takes sample audio as external input and screens on which to render the resulting fragment shader as external outputs.
 
-All nodes are invoked once a tick. One tick corresponds to one buffer as audio input as well to one visualization frame. Consequently, using a hop size of 1024 samples on an audio input of 44.1kHz results in a video frame rate of about 43 Hz.
+All nodes are invoked once a tick. One tick corresponds to one buffer of audio input as well to one visualization frame. Therefore, using a hop size of 1024 samples on an audio input of 44.1kHz results in a video frame rate of about 43 Hz.
 
-The typical visualization pipeline would first gather relevant information from the audio using a combination of the available analysis in each tick. The end-result of this stage as of now solely consists of scalar/floating point values.
+The typical visualization pipeline would first gather relevant information from the audio using a combination of the available analyses in each tick. The end-result of this stage as of now solely consists of scalar/floating point values.
 
 Subsequently, these scalars can be post-processed using arithmetic operations.
 
