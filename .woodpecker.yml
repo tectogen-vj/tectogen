@@ -1,0 +1,18 @@
+# .woodpecker.yml
+
+clone:
+  git:
+    image: woodpeckerci/plugin-git
+    settings:
+      recursive: true
+
+steps:
+  main:
+    image: ubuntu
+
+    commands:
+      - export DEBIAN_FRONTEND=noninteractive
+      - apt update
+      - apt install -y --no-install-recommends cmake clang libfftw3-dev libglfw3-dev ninja-build libglew-dev libwayland-dev libx11-dev libxrandr-dev libxxf86vm-dev libxcursor-dev libxinerama-dev libxi-dev libglm-dev
+      - cmake -Bbuild
+      - cmake --build build
