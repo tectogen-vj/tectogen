@@ -198,7 +198,7 @@ IF (WIN32)
     libsoundio_static ${LIBSOUNDIO_LIBS}
     libglew32.a
     ${OPENGL_LIBRARIES}
-    ${GLFW_LIBRARIES}
+    glfw
     ${FFTW_LIBRARIES}
     ${LIBSOUNDIO_LIBS}
   )
@@ -207,7 +207,7 @@ ELSE ()
     libsoundio_static
     ${GLEW_LIBRARIES}
     ${OPENGL_LIBRARIES}
-    ${GLFW_LIBRARIES}
+    glfw
     ${FFTW_LIBRARIES}
     ${LIBSOUNDIO_LIBS}
     ${CMAKE_THREAD_LIBS_INIT}
@@ -217,7 +217,7 @@ ENDIF()
 
 target_include_directories(${BINARY_TARGET} PRIVATE
     ${OPENGL_INCLUDE_DIRS}
-    ${GLFW_INCLUDE_DIRS}
+    ${GLFW3_INCLUDE_DIRS}
     ${FFTW_INCLUDE_DIRS}
     ${GLEW_INCLUDE_DIRS}
      PRIVATE ${IMGUI_DIR}
