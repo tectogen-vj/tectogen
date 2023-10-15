@@ -61,7 +61,7 @@ git submodule update --init --recursive
 
 Additionally you will need to satisfy the following dependencies (here listed by their ubuntu package names):
 
-Compile-time: A compiler, recent `g++` and `clang` versions are confirmed to work. `cmake pkg-config libglfw3-dev libglew-dev libfftw3-dev` and recommended but optional `libjack-jackd2-dev`. On Linux, possibly `libpulse-dev` `libasound2-dev` depending on what audio server you want available in your build.
+Compile-time: A compiler, recent `g++` and `clang` versions are confirmed to work. `cmake pkg-config libglfw3-dev libglew-dev libfftw3-dev libglm-dev` and recommended but optional `libjack-jackd2-dev`. On Linux, possibly `libpulse-dev` `libasound2-dev` depending on what audio server you want available in your build.
 Run-time: `libglfw3` `libfftw3-single3` and at least one of the aforementioned audio servers actually working
 
 Then you can build as is done with CMake, e.g.
