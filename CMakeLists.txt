@@ -157,7 +157,7 @@ find_package(GLEW REQUIRED)
 
 ## MODULES ##
 find_package(FFTW REQUIRED COMPONENTS SIMPLE) # signle precision fftw3f
-find_package(GLFW REQUIRED)
+find_package(glfw3 REQUIRED)
 # TODO: libsoundio module?
 
 if(USE_JET_LIVE)
