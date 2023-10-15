@@ -124,7 +124,8 @@ set(EXT_SOURCES
     ${IMGUI_DIR}/backends/imgui_impl_glfw.cpp
     )
 
-set(BINARY_TARGET "bin/${PROJECT_NAME}")
+set(BINARY_TARGET "${PROJECT_NAME}")
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 add_executable(${BINARY_TARGET} "")
 target_sources(${BINARY_TARGET}
