@@ -34,7 +34,9 @@ void Logs::log(const logSeverity severity, const char* emitter, const std::strin
   if(severity==logSeverity_Err) {
     volatile int i=0;
     if(raiseOnError) {
+#ifndef WIN32
       raise(SIGTRAP);
+#endif
     }
   }
   auto now=std::chrono::high_resolution_clock::now();

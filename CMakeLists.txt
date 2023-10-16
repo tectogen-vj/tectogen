@@ -202,6 +202,7 @@ IF (WIN32)
     glfw
     ${FFTW_LIBRARIES}
     ${LIBSOUNDIO_LIBS}
+    ${CMAKE_DL_LIBS}
   )
 ELSE ()
   target_link_libraries(${BINARY_TARGET} PRIVATE
@@ -212,6 +213,7 @@ ELSE ()
     ${FFTW_LIBRARIES}
     ${LIBSOUNDIO_LIBS}
     ${CMAKE_THREAD_LIBS_INIT}
+    ${CMAKE_DL_LIBS}
   )
 ENDIF()
 

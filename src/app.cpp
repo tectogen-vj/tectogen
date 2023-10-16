@@ -14,7 +14,8 @@ int App::init() {
   video.init();
   shadermanager.init();
   std::filesystem::path bindir = std::filesystem::weakly_canonical(std::filesystem::path(argv[0])).parent_path();
-  shadermanager.watch(bindir.parent_path().append("share").append("tectogen").append("shaders"));
+  std::filesystem::path watchdir=bindir.parent_path()/"share"/"tectogen"/"shaders";
+  shadermanager.watch(watchdir.string());
 
   ui.context.makeCurrent();
 

@@ -79,7 +79,7 @@ std::string readFile(const std::string& filename) {
 }
 
 FragmentShader::FragmentShader(const std::filesystem::directory_entry file)
-  : shader(GL_FRAGMENT_SHADER, readFile(file.path())),
+  : shader(GL_FRAGMENT_SHADER, readFile(file.path().string())),
     filename(file.path().filename().string()),
     name(filename.substr(0, filename.find('.')))
 {
