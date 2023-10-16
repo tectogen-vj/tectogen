@@ -16,5 +16,3 @@ steps:
       - apt install -y --no-install-recommends cmake clang libfftw3-dev libglfw3-dev ninja-build libglew-dev libwayland-dev libx11-dev libxrandr-dev libxxf86vm-dev libxcursor-dev libxinerama-dev libxi-dev libglm-dev libjack-jackd2-dev libpulse-dev libasound2-dev
       - cmake -Bbuild
       - cmake --build build
-    when:
-      event: manual
