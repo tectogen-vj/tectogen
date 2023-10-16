@@ -206,6 +206,7 @@ IF (WIN32)
     glfw
     ${FFTW_LIBRARIES}
     ${LIBSOUNDIO_LIBS}
+    PRIVATE sago::platform_folders
     ${CMAKE_DL_LIBS}
   )
 ELSE ()
