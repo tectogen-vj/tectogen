@@ -15,6 +15,8 @@
 #include "imgui_impl_opengl3.h"
 #include "imgui_internal.h" // for DockBuilderDockWindow etc.
 
+#include <sago/platform_folders.h>
+
 #include <GLFW/glfw3.h>
 #include <cstdlib>
 #include <memory>
@@ -49,6 +51,22 @@ int UIComponent::init() {
   //io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;         // Enable Multi-Viewport / Platform Windows
   //io.ConfigViewportsNoAutoMerge = true;
   //io.ConfigViewportsNoTaskBarIcon = true;
+
+  std::string configDir=sago::getConfigHome()+"/tectogen";
+
+  std::filesystem::path configPath(configDir);
+
+  if (!std::filesystem::exists(configPath)) {
+      try {
+        std::filesystem::create_directories(configPath);
+        Logs::get().logf(logSeverity_Debug, "UI", "Created config dir %s", configPath.c_str());
+      } catch (const std::filesystem::filesystem_error& e) {
+        Logs::get().logf(logSeverity_Err, "UI", "Failed to create config dir %s", configPath.c_str());
+      }
+  }
+
+  imGuiINIPath=configDir+"/imgui.ini";
+  io.IniFilename=imGuiINIPath.c_str();
 
   if (imContext.IO.IniFilename)
     ImGui::LoadIniSettingsFromDisk(imContext.IO.IniFilename);
