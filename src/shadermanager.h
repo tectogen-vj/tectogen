@@ -33,5 +33,6 @@ public:
   std::filesystem::path path;
   void reloadFile(std::string file);
   void reloadFile(std::filesystem::directory_entry file);
+  void reloadFile(std::filesystem::path file);
   Shader vertex_shader;
 };

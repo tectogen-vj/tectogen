@@ -115,3 +115,8 @@ void ShaderManager::reloadFile(const std::filesystem::directory_entry file) {
   }
 }
 
+void ShaderManager::reloadFile(std::filesystem::__cxx11::path file)
+{
+  reloadFile(std::filesystem::directory_entry(file.string())); // HACK
+}
+
