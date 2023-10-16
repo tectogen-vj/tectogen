@@ -15,7 +15,7 @@ int App::init() {
   shadermanager.init();
   std::filesystem::path bindir = std::filesystem::weakly_canonical(std::filesystem::path(argv[0])).parent_path();
   std::filesystem::path watchdir=bindir.parent_path()/"share"/"tectogen"/"shaders";
-  shadermanager.watch(watchdir);
+  shadermanager.watch(watchdir.string());
 
   ui.context.makeCurrent();
 
