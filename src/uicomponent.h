@@ -28,6 +28,7 @@ class UIComponent
   NodeWindow nodeWindow;
   GLuint vertex_buffer;
   bool show_app_stack_tool=false;
+  std::string imGuiINIPath;
 #ifdef USE_JET_LIVE
   JetTools jetTools;
 #endif

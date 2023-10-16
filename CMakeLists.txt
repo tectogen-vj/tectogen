@@ -20,8 +20,11 @@ set(EXTPATH_LIBSOUNDIO "${CMAKE_SOURCE_DIR}/ext/libsoundio"
 set(IMGUI_DIR "${CMAKE_SOURCE_DIR}/ext/imgui"
     CACHE PATH "Where to find imgui, this directory contains imgui.cpp etc.")
 
-  set(IMNODES_DIR "${CMAKE_SOURCE_DIR}/ext/imnodes"
-      CACHE PATH "Where to find imnodes")
+set(IMNODES_DIR "${CMAKE_SOURCE_DIR}/ext/imnodes"
+    CACHE PATH "Where to find imnodes")
+
+set(EXTPATH_PLATFORMFOLDERS "${CMAKE_SOURCE_DIR}/ext/PlatformFolders"
+    CACHE PATH "Where to find PlatformFolders")
 
 option(USE_JET_LIVE "Use jet-live library for hot code reloading" OFF)
 if(USE_JET_LIVE)
@@ -177,6 +180,7 @@ set(BUILD_EXAMPLE_PROGRAMS OFF CACHE BOOL "Build example programs" FORCE)
 set(BUILD_TESTS OFF CACHE BOOL "Build tests" FORCE)
 
 add_subdirectory(${EXTPATH_LIBSOUNDIO})
+add_subdirectory(${EXTPATH_PLATFORMFOLDERS})
 
 # https://github.com/andrewrk/libsoundio/issues/276
 set_property(DIRECTORY "${EXTPATH_LIBSOUNDIO}" APPEND PROPERTY COMPILE_DEFINITIONS "NDEBUG")
@@ -212,6 +216,7 @@ ELSE ()
     glfw
     ${FFTW_LIBRARIES}
     ${LIBSOUNDIO_LIBS}
+    PRIVATE sago::platform_folders
     ${CMAKE_THREAD_LIBS_INIT}
     ${CMAKE_DL_LIBS}
   )
@@ -228,6 +233,7 @@ target_include_directories(${BINARY_TARGET} PRIVATE
      PRIVATE ${IMNODES_DIR}
      PRIVATE ${PROJ_DIR}
      ${EXTPATH_LIBSOUNDIO}
+     ${EXTPATH_PLATFORMFOLDERS}
      PRIVATE ${EXTPATH_DMON}
      PRIVATE ${EXTPATH_VISIT_STRUCT}
 )

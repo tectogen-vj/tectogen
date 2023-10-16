@@ -16,3 +16,6 @@
 [submodule "ext/imnodes"]
 	path = ext/imnodes
 	url = https://github.com/Nelarius/imnodes
+[submodule "ext/PlatformFolders"]
+	path = ext/PlatformFolders
+	url = https://github.com/sago007/PlatformFolders
