@@ -1,5 +1,8 @@
 # .woodpecker.yml
 
+when:
+  event: tag
+
 clone:
   git:
     image: woodpeckerci/plugin-git
@@ -8,9 +11,26 @@ clone:
       lfs: false
 
 steps:
-  main:
+  build:
     image: tectogen/build-old-ubuntu
-
     commands:
-      - cmake -Bbuild
-      - cmake --build build
+      - cmake -Btectogen-linux
+      - cmake --build tectogen-linux
+      - tar czvf tectogen-linux.tar.gz tectogen-linux/bin tectogen-linux/share
+      - PATH="/mxe/usr/bin/:$PATH" x86_64-w64-mingw32.static-cmake -Btectogen-windows
+      - PATH="/mxe/usr/bin/:$PATH" x86_64-w64-mingw32.static-cmake --build tectogen-windows
+      - 7z a -tzip tectogen-windows.zip tectogen-windows/bin tectogen-windows/share
+  publish:
+    image: woodpeckerci/plugin-gitea-release
+    when:
+      event: tag
+    settings:
+      base_url: https://codeberg.org
+      files:
+        - "tectogen-linux.tar.gz"
+        - "tectogen-windows.zip"
+      file-exists: fail
+      api_key:
+        from_secret: codeberg_access_token
+      target: main
+      title: tectogen ${CI_COMMIT_TAG}
