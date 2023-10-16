@@ -124,7 +124,8 @@ set(EXT_SOURCES
     ${IMGUI_DIR}/backends/imgui_impl_glfw.cpp
     )
 
-set(BINARY_TARGET "bin/${PROJECT_NAME}")
+set(BINARY_TARGET "${PROJECT_NAME}")
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 add_executable(${BINARY_TARGET} "")
 target_sources(${BINARY_TARGET}
@@ -157,7 +158,7 @@ find_package(GLEW REQUIRED)
 
 ## MODULES ##
 find_package(FFTW REQUIRED COMPONENTS SIMPLE) # signle precision fftw3f
-find_package(GLFW REQUIRED)
+find_package(glfw3 REQUIRED)
 # TODO: libsoundio module?
 
 if(USE_JET_LIVE)
@@ -198,7 +199,7 @@ IF (WIN32)
     libsoundio_static ${LIBSOUNDIO_LIBS}
     libglew32.a
     ${OPENGL_LIBRARIES}
-    ${GLFW_LIBRARIES}
+    glfw
     ${FFTW_LIBRARIES}
     ${LIBSOUNDIO_LIBS}
   )
@@ -207,7 +208,7 @@ ELSE ()
     libsoundio_static
     ${GLEW_LIBRARIES}
     ${OPENGL_LIBRARIES}
-    ${GLFW_LIBRARIES}
+    glfw
     ${FFTW_LIBRARIES}
     ${LIBSOUNDIO_LIBS}
     ${CMAKE_THREAD_LIBS_INIT}
@@ -217,7 +218,7 @@ ENDIF()
 
 target_include_directories(${BINARY_TARGET} PRIVATE
     ${OPENGL_INCLUDE_DIRS}
-    ${GLFW_INCLUDE_DIRS}
+    ${GLFW3_INCLUDE_DIRS}
     ${FFTW_INCLUDE_DIRS}
     ${GLEW_INCLUDE_DIRS}
      PRIVATE ${IMGUI_DIR}
