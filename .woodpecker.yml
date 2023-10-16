@@ -5,6 +5,7 @@ clone:
     image: woodpeckerci/plugin-git
     settings:
       recursive: true
+      lfs: false
 
 steps:
   main:
