@@ -74,7 +74,7 @@ cmake --build build
 
 ## Running
 
-After building tectogen or fetching a binary release, run `build/bin/tectogen` or `bin/tectogen` and it will find the supplemental files in its `share` directory. Some state will be stored in an ini file such as `~/.config/tectogen/imgui.ini` (depending on the OS or linux `XDG_CONFIG_HOME` env). Most importantly: The tectogen UI will show up.
+After building tectogen or fetching a [binary release](https://codeberg.org/tectogen/tectogen/releases), run `build/bin/tectogen` or `bin/tectogen` and it will find the supplemental files in its `share` directory. Some state will be stored in an ini file such as `~/.config/tectogen/imgui.ini` (depending on the OS or linux `XDG_CONFIG_HOME` env). Most importantly: The tectogen UI will show up.
 
 ## Contributing and Feedback
 
