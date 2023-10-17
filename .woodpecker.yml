@@ -29,6 +29,7 @@ steps:
       files:
         - "tectogen-linux.tar.gz"
         - "tectogen-windows.zip"
+      prerelease: true
       file-exists: fail
       api_key:
         from_secret: codeberg_access_token
