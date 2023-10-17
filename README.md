@@ -8,6 +8,7 @@ tectogen is an experimental graphical application to live-code, combine and musi
  - [Project Description](#project-description)
  - [Prerequisites](#prerequisites)
  - [Building](#building)
+ - [Running](#running)
  - [Contributing and Feedback](#contributing-and-feedback)
  - [Roadmap](#roadmap)
  - [Logo](#logo)
@@ -71,7 +72,9 @@ cmake -Bbuild
 cmake --build build
 ```
 
-This will create a single binary in the build directory that, when executed, will search for a `shader` directory in the current path containing .frag files with the shader functions (try those from the `ext` directory) and will create an `imgui.ini` file, which holds not only `imgui`'s window/dock state and such but also some state of tectogen itself.
+## Running
+
+After building tectogen or fetching a binary release, run `build/bin/tectogen` or `bin/tectogen` and it will find the supplemental files in its `share` directory. Some state will be stored in an ini file such as `~/.config/tectogen/imgui.ini` (depending on the OS or linux `XDG_CONFIG_HOME` env). Most importantly: The tectogen UI will show up.
 
 ## Contributing and Feedback
 
