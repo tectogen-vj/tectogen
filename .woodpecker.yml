@@ -12,7 +12,7 @@ clone:
 
 steps:
   build:
-    image: tectogen/build-old-ubuntu
+    image: codeberg.org/tectogen/build-old-ubuntu:latest
     commands:
       - cmake -Btectogen-linux
       - cmake --build tectogen-linux
