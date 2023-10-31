@@ -188,10 +188,10 @@ int UIComponent::tick() {
   if(show_app_stack_tool) {
     ImGui::ShowStackToolWindow(&show_app_stack_tool);
   }
+  monitoringWindow.show();
   console.show();
   audioConfigWindow.show();
   nodeWindow.show();
-  monitoringWindow.show();
   ImGui::PopStyleColor();
   ImGui::Render();
   int display_w, display_h;
