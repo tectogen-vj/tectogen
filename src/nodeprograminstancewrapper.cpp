@@ -67,7 +67,7 @@ void NodeProgramInstanceWrapper::M::linkBuffers()
   NodeGraph& ng=App::get().nodemanager.nodegraph;
   for(int i=0; i<node.getProgramDescriptor()->portCount; i++) {
     const NodeProgramPortDescriptor& portdesc=node.getProgramDescriptor()->portDescriptors[i];
-    if (portdesc.role==NodeProgramPortRoleInput) {
+    if (portdesc.role==NodeProgramPortRoleInput && portdesc.type!=NodeProgramPortTypeShader) {
       // STYLE
       NodeInput& input=ng.nodeInputs.at(node.id+i+1);
       NodeOutput* source=input.source;
