@@ -14,7 +14,10 @@ class App {
    */
   
 public:
-  static App& get();
+  static App& get() {
+    static App instance;
+    return instance;
+  }
   
 private:
   App();

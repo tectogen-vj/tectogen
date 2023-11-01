@@ -33,11 +33,6 @@ int App::shutdown() {
   return 0;
 }
 
-App& App::get() {
-  static App instance;
-  return instance;
-}
-
 App::App() {
   startTime = std::chrono::high_resolution_clock::now();
 }
