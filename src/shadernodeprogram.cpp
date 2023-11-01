@@ -7,7 +7,7 @@ void ShaderNodeProgram::invoke(tn_Handle instance, tn_State *state) {
   for(int i=0; i<selfDesc->portCount; i++) {
     if(selfDesc->portDescriptors[i].role==tn_PortRoleInput) {
       if(selfDesc->portDescriptors[i].type==tn_PortTypeScalar) {
-        double** payload=(double**)(state->portState[i].payload);
+        double** payload=(double**)(state->portState[i].payload_symbol_to_be_obsoleted);
         if(payload && *payload) {
           GLfloat v=(float) **payload;
           if(userdata) {

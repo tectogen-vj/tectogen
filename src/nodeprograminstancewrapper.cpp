@@ -28,15 +28,15 @@ NodeProgramInstanceWrapper::M::M(const Node &node) :
       if(portdesc.type==tn_PortTypeSampleBlock) {
         size_t bufsize=App::get().instreammanager.blocksize*sizeof(float);
         buffers.emplace_back(bufsize);
-        state.portState[i].payload=buffers.back()->getWrite();
+        state.portState[i].payload_symbol_to_be_obsoleted=buffers.back()->getWrite();
       } else if(portdesc.type==tn_PortTypeSpectrum) {
         size_t bufsize=App::get().instreammanager.fftAlign;
         buffers.emplace_back(bufsize);
-        state.portState[i].payload=buffers.back()->getWrite();
+        state.portState[i].payload_symbol_to_be_obsoleted=buffers.back()->getWrite();
       } else if(portdesc.type==tn_PortTypeScalar) {
         size_t bufsize=sizeof(double);
         buffers.emplace_back(bufsize);
-        state.portState[i].payload=buffers.back()->getWrite();
+        state.portState[i].payload_symbol_to_be_obsoleted=buffers.back()->getWrite();
       }
       NodeOutput& output=ng.nodeOutputs.at(node.id+i+1);
     } else if (portdesc.role==tn_PortRoleInput) {
@@ -57,8 +57,8 @@ NodeProgramInstanceWrapper::M::M(M &&a) noexcept :
   state({.portState=portStateArr.data(),.userdata=nullptr,.descriptor=node.getProgramDescriptor(),.instanceId=node.id})
 {
   for(int i=0; i<descriptor->portCount; i++) {
-    state.portState[i].payload=a.state.portState[i].payload;
-    a.state.portState[i].payload=nullptr;
+    state.portState[i].payload_symbol_to_be_obsoleted=a.state.portState[i].payload_symbol_to_be_obsoleted;
+    a.state.portState[i].payload_symbol_to_be_obsoleted=nullptr;
   }
 }
 
@@ -74,9 +74,9 @@ void NodeProgramInstanceWrapper::M::linkBuffers()
       if(source) {
         // FIXME: value none coredump when connecting shader with shader
         // FIXME: STYLE: split this up, add intermediates and methods to the Node* classes
-        state.portState[i].payload=source->source->getInstance().m->buffers[source->id-source->source->id-1].value().getWrite();
+        state.portState[i].payload_symbol_to_be_obsoleted=source->source->getInstance().m->buffers[source->id-source->source->id-1].value().getWrite();
       } else {
-        state.portState[i].payload=nullptr;
+        state.portState[i].payload_symbol_to_be_obsoleted=nullptr;
       }
     }
   }

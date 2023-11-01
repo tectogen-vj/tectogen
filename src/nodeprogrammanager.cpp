@@ -21,7 +21,7 @@ void NodeProgramManager::loadTypes() {
     },[](tn_Handle handle, tn_State* state){
       InStreamManager& ism=App::get().instreammanager;
       size_t bufsize=ism.blocksize*sizeof(float);
-      void* payload=*state->portState[0].payload;
+                        void* payload=*state->portState[0].payload_symbol_to_be_obsoleted;
       memcpy(payload, (void*)ism.inStreamBuffer.newest(), bufsize);
   }));
   // HACK
@@ -34,10 +34,10 @@ void NodeProgramManager::loadTypes() {
       {"waveform", tn_PortRoleInput, tn_PortTypeSampleBlock},
       {"spectrum", tn_PortRoleOutput, tn_PortTypeSpectrum}
     },[](tn_Handle handle, tn_State* state){
-      if(state->portState[0].payload) {
-        void* payload0=*(state->portState[0].payload);
+    if(state->portState[0].payload_symbol_to_be_obsoleted) {
+      void* payload0=*(state->portState[0].payload_symbol_to_be_obsoleted);
         float* inbuf=(float*)(payload0);
-        void* payload1=*(state->portState[1].payload);
+        void* payload1=*(state->portState[1].payload_symbol_to_be_obsoleted);
         fftwf_complex* outbuf=(fftwf_complex*)payload1;
 
         fftwf_plan& fftPlan=App::get().instreammanager.fftPlan;
@@ -55,10 +55,10 @@ void NodeProgramManager::loadTypes() {
       {"raw spectrum", tn_PortRoleInput, tn_PortTypeSpectrum},
       {"eq spectrum", tn_PortRoleOutput, tn_PortTypeSpectrum}
     },[](tn_Handle handle, tn_State* state){
-      if(state->portState[0].payload) {
-        void* payload0=*(state->portState[0].payload);
+    if(state->portState[0].payload_symbol_to_be_obsoleted) {
+      void* payload0=*(state->portState[0].payload_symbol_to_be_obsoleted);
         std::complex<float>* inbuf=(std::complex<float>*)(payload0);
-        void* payload1=*(state->portState[1].payload);
+        void* payload1=*(state->portState[1].payload_symbol_to_be_obsoleted);
         std::complex<float>* outbuf=(std::complex<float>*)payload1;
 
         InStreamManager& ism=App::get().instreammanager;
@@ -76,10 +76,10 @@ void NodeProgramManager::loadTypes() {
       {"spectrum", tn_PortRoleInput, tn_PortTypeSpectrum},
       {"sum", tn_PortRoleOutput, tn_PortTypeScalar}
     },[](tn_Handle handle, tn_State* state){
-      if(state->portState[0].payload) {
-        void* payload0=*(state->portState[0].payload);
+    if(state->portState[0].payload_symbol_to_be_obsoleted) {
+      void* payload0=*(state->portState[0].payload_symbol_to_be_obsoleted);
         std::complex<float>* inbuf=(std::complex<float>*)(payload0);
-        void* payload1=*(state->portState[1].payload);
+        void* payload1=*(state->portState[1].payload_symbol_to_be_obsoleted);
         double* outbuf=(double*)payload1;
         int fftElem=App::get().instreammanager.fftElem;
         double a=0;

@@ -61,7 +61,7 @@ typedef struct tn_PortDescriptor {
 } tn_PortDescriptor;
 
 typedef struct tn_PortState {
-  void** payload;
+  void** payload_symbol_to_be_obsoleted;
 } tn_PortState;
 
 typedef struct tn_Descriptor tn_Descriptor; // foward decl.
