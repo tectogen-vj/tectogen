@@ -21,29 +21,29 @@ NodeProgramInstanceWrapper::M::M(const Node &node) :
 {
   NodeGraph& ng=App::get().nodemanager.nodegraph;
   for(int i=0; i<node.getProgramDescriptor()->portCount; i++) {
-    const NodeProgramPortDescriptor& portdesc=node.getProgramDescriptor()->portDescriptors[i];
-    if(portdesc.role==NodeProgramPortRoleOutput) {
+    const tn_PortDescriptor& portdesc=node.getProgramDescriptor()->portDescriptors[i];
+    if(portdesc.role==tn_PortRoleOutput) {
       // make sure to emplace at index i, insert nullopts before
       buffers.resize(i);
-      if(portdesc.type==NodeProgramPortTypeSampleBlock) {
+      if(portdesc.type==tn_PortTypeSampleBlock) {
         size_t bufsize=App::get().instreammanager.blocksize*sizeof(float);
         buffers.emplace_back(bufsize);
         state.portState[i].payload=buffers.back()->getWrite();
-      } else if(portdesc.type==NodeProgramPortTypeSpectrum) {
+      } else if(portdesc.type==tn_PortTypeSpectrum) {
         size_t bufsize=App::get().instreammanager.fftAlign;
         buffers.emplace_back(bufsize);
         state.portState[i].payload=buffers.back()->getWrite();
-      } else if(portdesc.type==NodeProgramPortTypeScalar) {
+      } else if(portdesc.type==tn_PortTypeScalar) {
         size_t bufsize=sizeof(double);
         buffers.emplace_back(bufsize);
         state.portState[i].payload=buffers.back()->getWrite();
       }
       NodeOutput& output=ng.nodeOutputs.at(node.id+i+1);
-    } else if (portdesc.role==NodeProgramPortRoleInput) {
+    } else if (portdesc.role==tn_PortRoleInput) {
       placeholders.resize(i);
-      if(portdesc.type==NodeProgramPortTypeShader) {
+      if(portdesc.type==tn_PortTypeShader) {
         placeholders.emplace_back(std::make_unique<uint8_t[]>(4*sizeof(float)));
-      } else if(portdesc.type==NodeProgramPortTypeScalar) {
+      } else if(portdesc.type==tn_PortTypeScalar) {
         placeholders.emplace_back(std::make_unique<uint8_t[]>(sizeof(double)));
       }
     }
@@ -66,8 +66,8 @@ void NodeProgramInstanceWrapper::M::linkBuffers()
 {
   NodeGraph& ng=App::get().nodemanager.nodegraph;
   for(int i=0; i<node.getProgramDescriptor()->portCount; i++) {
-    const NodeProgramPortDescriptor& portdesc=node.getProgramDescriptor()->portDescriptors[i];
-    if (portdesc.role==NodeProgramPortRoleInput && portdesc.type!=NodeProgramPortTypeShader) {
+    const tn_PortDescriptor& portdesc=node.getProgramDescriptor()->portDescriptors[i];
+    if (portdesc.role==tn_PortRoleInput && portdesc.type!=tn_PortTypeShader) {
       // STYLE
       NodeInput& input=ng.nodeInputs.at(node.id+i+1);
       NodeOutput* source=input.source;

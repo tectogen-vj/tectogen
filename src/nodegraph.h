@@ -24,7 +24,7 @@ struct NodeOutput;
 
 class Node {
 private:
-  //const NodeProgramDescriptor* program;
+  //const tn_Descriptor* program;
   const NodeProgramType program;
   std::optional<NodeProgramInstanceWrapper> instance;
 public:
@@ -32,9 +32,9 @@ public:
   Node(nodeid id, const NodeProgramType program):id(id), program(program) {};
   std::vector<NodeInput*> in;
   std::vector<NodeOutput*> out;
-  inline const NodeProgramDescriptor* getProgramDescriptor() const {return program.desc;}
+  inline const tn_Descriptor* getProgramDescriptor() const {return program.desc;}
   inline const NodeProgramType getProgramType() const {return program;}
-  //NodeProgramState* state;
+  //tn_State* state;
   NodeProgramInstanceWrapper getInstance() const;
   void instantiate();
 };
@@ -44,7 +44,7 @@ struct NodeInput {
   NodeInput(nodeid id, Node* target):id(id), target(target), source(nullptr) {};
   NodeOutput* source;
   Node* target;
-  inline const NodeProgramPortDescriptor* getPortDescriptor() {
+  inline const tn_PortDescriptor* getPortDescriptor() {
     return &target->getProgramDescriptor()->portDescriptors[id-target->id-1];
   }
 };
@@ -54,7 +54,7 @@ struct NodeOutput {
   NodeOutput(nodeid id, Node* source):id(id), source(source) {};
   std::unordered_set<NodeInput*> targets;
   Node* source;
-  inline const NodeProgramPortDescriptor* getPortDescriptor() {
+  inline const tn_PortDescriptor* getPortDescriptor() {
     return &source->getProgramDescriptor()->portDescriptors[id-source->id-1];
   }
 };

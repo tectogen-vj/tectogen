@@ -10,10 +10,10 @@
 
 void NodeProgramLibrary::reg(Entry& newEntry) {
   auto portCount=newEntry.programDescriptor->portCount;
-  const NodeProgramPortDescriptor* portDescriptors=newEntry.programDescriptor->portDescriptors;
+  const tn_PortDescriptor* portDescriptors=newEntry.programDescriptor->portDescriptors;
   for (int i=0; i<portCount; i++) {
     auto& portDesc=portDescriptors[i];
-    if(portDesc.role == NodeProgramPortRoleInput) {
+    if(portDesc.role == tn_PortRoleInput) {
       if (portDesc.type>maxKnownInputType) {
         maxKnownInputType=portDesc.type;
         newEntry.hasInputType.resize(maxKnownInputType+1, false);
@@ -29,13 +29,13 @@ NodeProgramLibrary::NodeProgramLibrary() : maxKnownInputType(0) {
 }
 
 NodeProgramType NodeProgramLibrary::addProgramType(const char* identifier,
-    std::initializer_list<NodeProgramPortDescriptor> portDescriptors,
-    void (*invokeFunction)(NodeProgramHandle handle, NodeProgramState* state),
-    NodeProgramHandle (*instantiateFunction)(const NodeProgramDescriptor* descriptor))
+    std::initializer_list<tn_PortDescriptor> portDescriptors,
+    void (*invokeFunction)(tn_Handle handle, tn_State* state),
+    tn_Handle (*instantiateFunction)(const tn_Descriptor* descriptor))
 {
   Entry newEntry(maxKnownInputType);
 
-  newEntry.portDescriptors = std::make_unique<NodeProgramPortDescriptor[]>(portDescriptors.size());
+  newEntry.portDescriptors = std::make_unique<tn_PortDescriptor[]>(portDescriptors.size());
   std::copy(portDescriptors.begin(), portDescriptors.end(), newEntry.portDescriptors.get());
   newEntry.programDescriptor->portDescriptors = newEntry.portDescriptors.get();
   newEntry.programDescriptor->portCount = static_cast<unsigned int>(portDescriptors.size());
@@ -45,8 +45,8 @@ NodeProgramType NodeProgramLibrary::addProgramType(const char* identifier,
   if(invokeFunction) {
     newEntry.metadata->type=NodeProgramMetadata::Type::Runnable;
   } else if (newEntry.programDescriptor->portCount==1
-             && newEntry.programDescriptor->portDescriptors[0].type==NodeProgramPortTypeShader
-             && newEntry.programDescriptor->portDescriptors[0].role==NodeProgramPortRoleInput) {
+             && newEntry.programDescriptor->portDescriptors[0].type==tn_PortTypeShader
+             && newEntry.programDescriptor->portDescriptors[0].role==tn_PortRoleInput) {
     newEntry.metadata->type=NodeProgramMetadata::Type::Display;
   }
 
@@ -78,24 +78,24 @@ void NodeProgramLibrary::addFragmentShader(FragmentShader *frag) {
   if(type==NodeProgramMetadata::Type::CoordShader) {
     // "Shader" in, "Shader" out plus the uniforms, that is the number of ports on CoordShader
     portCount=2+frag->uniforms.size();
-    newEntry.portDescriptors = std::make_unique<NodeProgramPortDescriptor[]>(portCount);
-    NodeProgramPortDescriptor* descriptors=newEntry.portDescriptors.get();
+    newEntry.portDescriptors = std::make_unique<tn_PortDescriptor[]>(portCount);
+    tn_PortDescriptor* descriptors=newEntry.portDescriptors.get();
     newEntry.programDescriptor->portDescriptors = descriptors;
     for(int i=0; i<portCount; i++) {
-      NodeProgramPortDescriptor& portDesc=descriptors[i];
+      tn_PortDescriptor& portDesc=descriptors[i];
       // Parameters first, uniforms second
       if(i<2) {
         portDesc.name=frag->parameters[i].v.c_str();
         if(frag->parameters[i].s==FragmentShader::Param::Storage::in) {
-          portDesc.role=NodeProgramPortRoleInput;
+          portDesc.role=tn_PortRoleInput;
         } else {
-          portDesc.role=NodeProgramPortRoleOutput;
+          portDesc.role=tn_PortRoleOutput;
         }
-        portDesc.type=NodeProgramPortTypeShader;
+        portDesc.type=tn_PortTypeShader;
       } else {
         portDesc.name=frag->uniforms[i-2].c_str();
-        portDesc.role=NodeProgramPortRoleInput;
-        portDesc.type=NodeProgramPortTypeScalar;
+        portDesc.role=tn_PortRoleInput;
+        portDesc.type=tn_PortTypeScalar;
 
       }
     }
@@ -108,8 +108,8 @@ void NodeProgramLibrary::addFragmentShader(FragmentShader *frag) {
 
     int paramCount=frag->parameters.size()-vec2InCount;
     portCount=paramCount+frag->uniforms.size();
-    newEntry.portDescriptors = std::make_unique<NodeProgramPortDescriptor[]>(portCount);
-    NodeProgramPortDescriptor* descriptors=newEntry.portDescriptors.get();
+    newEntry.portDescriptors = std::make_unique<tn_PortDescriptor[]>(portCount);
+    tn_PortDescriptor* descriptors=newEntry.portDescriptors.get();
     newEntry.programDescriptor->portDescriptors = descriptors;
     int i=0;
     for(auto it=frag->parameters.begin(); it!=frag->parameters.end(); it++) {
@@ -117,21 +117,21 @@ void NodeProgramLibrary::addFragmentShader(FragmentShader *frag) {
       if(it->t==FragmentShader::Param::Type::vec2) {
         continue;
       }
-      NodeProgramPortDescriptor& portDesc=descriptors[i];
+      tn_PortDescriptor& portDesc=descriptors[i];
       portDesc.name=it->v.c_str();
       if(it->s==FragmentShader::Param::Storage::in) {
-        portDesc.role=NodeProgramPortRoleInput;
+        portDesc.role=tn_PortRoleInput;
       } else {
-        portDesc.role=NodeProgramPortRoleOutput;
+        portDesc.role=tn_PortRoleOutput;
       }
-      portDesc.type=NodeProgramPortTypeShader;
+      portDesc.type=tn_PortTypeShader;
       i++;
     }
     for(auto it=frag->uniforms.begin(); it!=frag->uniforms.end(); it++) {
-      NodeProgramPortDescriptor& portDesc=descriptors[i];
+      tn_PortDescriptor& portDesc=descriptors[i];
       portDesc.name=it->c_str();
-      portDesc.role=NodeProgramPortRoleInput;
-      portDesc.type=NodeProgramPortTypeScalar;
+      portDesc.role=tn_PortRoleInput;
+      portDesc.type=tn_PortTypeScalar;
 
       i++;
     }
@@ -147,7 +147,7 @@ void NodeProgramLibrary::addFragmentShader(FragmentShader *frag) {
   reg(newEntry);
 }
 
-std::vector<NodeProgramType> NodeProgramLibrary::getProgramsWithInputType(NodeProgramPortType type) {
+std::vector<NodeProgramType> NodeProgramLibrary::getProgramsWithInputType(tn_PortType type) {
   std::vector<NodeProgramType> programs;
 
   for (auto& entry : lib) {

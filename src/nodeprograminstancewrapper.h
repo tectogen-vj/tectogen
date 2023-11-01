@@ -16,9 +16,9 @@ class NodeProgramInstanceWrapper {
 private:
   struct M {
     const Node& node;
-    const NodeProgramDescriptor* descriptor;
-    std::vector<NodeProgramPortState> portStateArr;
-    NodeProgramState state;
+    const tn_Descriptor* descriptor;
+    std::vector<tn_PortState> portStateArr;
+    tn_State state;
     M(const Node& node);
     ~M();
     *M(const M&) = delete;
@@ -42,5 +42,5 @@ public:
   void invoke();
   inline std::vector<std::optional<MultiBuffer>>* getBuffers() {return &m->buffers;}
   inline std::vector<std::optional<std::unique_ptr<uint8_t[]>>>* getPlaceholders() {return &m->placeholders;}
-  inline NodeProgramState* getProgramState() {return &m->state;}
+  inline tn_State* getProgramState() {return &m->state;}
 };

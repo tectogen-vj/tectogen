@@ -1,12 +1,12 @@
 #include "shadernodeprogram.h"
 
-void ShaderNodeProgram::invoke(NodeProgramHandle instance, NodeProgramState *state) {
+void ShaderNodeProgram::invoke(tn_Handle instance, tn_State *state) {
   ShaderNodeProgram::Userdata* userdata=(ShaderNodeProgram::Userdata*)state->userdata;
-  const NodeProgramDescriptor* selfDesc=state->descriptor;
+  const tn_Descriptor* selfDesc=state->descriptor;
 
   for(int i=0; i<selfDesc->portCount; i++) {
-    if(selfDesc->portDescriptors[i].role==NodeProgramPortRoleInput) {
-      if(selfDesc->portDescriptors[i].type==NodeProgramPortTypeScalar) {
+    if(selfDesc->portDescriptors[i].role==tn_PortRoleInput) {
+      if(selfDesc->portDescriptors[i].type==tn_PortTypeScalar) {
         double** payload=(double**)(state->portState[i].payload);
         if(payload && *payload) {
           GLfloat v=(float) **payload;

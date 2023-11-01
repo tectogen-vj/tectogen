@@ -7,15 +7,15 @@ Node *NodeGraph::addNode(const NodeProgramType program) {
   Node* newNode=&nodes.insert({objectId, Node(objectId, program)}).first->second;
   objectId++;
   for(int i=0; i<program.desc->portCount; i++) {
-    const NodeProgramPortDescriptor& port=program.desc->portDescriptors[i];
+    const tn_PortDescriptor& port=program.desc->portDescriptors[i];
     switch (port.role) {
-      case NodeProgramPortRoleInput:
+      case tn_PortRoleInput:
       {
         const auto& nin=nodeInputs.insert({objectId, NodeInput(objectId, newNode)});
         newNode->in.push_back(&nin.first->second);
         break;
       }
-      case NodeProgramPortRoleOutput:
+      case tn_PortRoleOutput:
       {
         const auto& non=nodeOutputs.insert({objectId, NodeOutput(objectId, newNode)});
         newNode->out.push_back(&non.first->second);

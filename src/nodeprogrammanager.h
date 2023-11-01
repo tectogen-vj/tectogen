@@ -25,7 +25,7 @@ public:
   NodeGraph nodegraph;
   std::atomic<InvocationList*> newInvocationList;
   std::atomic<InvocationList*> invocationList;
-  //std::vector<std::unique_ptr<NodeProgramDescriptor>> nodeTypes;
+  //std::vector<std::unique_ptr<tn_Descriptor>> nodeTypes;
   std::optional<NodeProgramType> audioInType;
   std::optional<NodeProgramType> displayType;
   void loadTypes();

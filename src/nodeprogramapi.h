@@ -5,51 +5,51 @@
 extern "C" {
 #endif
 
-typedef enum NodeProgramPortRole {
-  NodeProgramPortRoleInput=1,
-  NodeProgramPortRoleOutput=2,
-  NodeProgramPortRoleControl=3,
-  NodeProgramPortRoleDisplay=4
-} NodeProgramPortRole;
+typedef enum tn_PortRole {
+  tn_PortRoleInput=1,
+  tn_PortRoleOutput=2,
+  tn_PortRoleControl=3,
+  tn_PortRoleDisplay=4
+} tn_PortRole;
 
-typedef enum NodeProgramPortType {
-  NodeProgramPortTypeScalar=8,
-  NodeProgramPortTypeSampleBlock=9,
-  NodeProgramPortTypeSpectrum=10,
-  NodeProgramPortTypeShader=11
-} NodeProgramPortType;
+typedef enum tn_PortType {
+  tn_PortTypeScalar=8,
+  tn_PortTypeSampleBlock=9,
+  tn_PortTypeSpectrum=10,
+  tn_PortTypeShader=11
+} tn_PortType;
 
-typedef void* NodeProgramHandle;
+typedef void* tn_Handle;
 
-typedef struct NodeProgramPortDescriptor {
+typedef struct tn_PortDescriptor {
   const char* name;
-  NodeProgramPortRole role;
-  NodeProgramPortType type;
-} NodeProgramPortDescriptor;
+  tn_PortRole role;
+  tn_PortType type;
+} tn_PortDescriptor;
 
-typedef struct NodeProgramPortState {
+typedef struct tn_PortState {
   void** payload;
-} NodeProgramPortState;
+} tn_PortState;
 
-typedef struct NodeProgramDescriptor NodeProgramDescriptor; // foward decl.
+typedef struct tn_Descriptor tn_Descriptor; // foward decl.
 
-typedef struct NodeProgramState {
-  NodeProgramPortState* portState;
+typedef struct tn_State {
+  tn_PortState* portState;
   void* userdata;
-  const NodeProgramDescriptor* descriptor;
+  const tn_Descriptor* descriptor;
   const int instanceId;
-} NodeProgramState;
+} tn_State;
 
-typedef struct NodeProgramDescriptor {
+typedef struct tn_Descriptor {
   const char * identifier;
   unsigned int portCount;
-  const NodeProgramPortDescriptor* portDescriptors;
+  const tn_PortDescriptor* portDescriptors;
   void* userdata;
-  NodeProgramHandle (*instantiate)(const NodeProgramDescriptor* descriptor);
-  void (*invoke)(NodeProgramHandle instance, NodeProgramState* state);
-} NodeProgramDescriptor;
+  tn_Handle (*instantiate)(const tn_Descriptor* descriptor);
+  void (*invoke)(tn_Handle instance, tn_State* state);
+} tn_Descriptor;
 
-typedef const NodeProgramDescriptor* (*NodeProgramDescriptorLoader)(unsigned long index);
+typedef const tn_Descriptor* (*tn_DescriptorLoader)(unsigned long index);
 
 #ifdef __cplusplus
 }

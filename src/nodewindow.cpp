@@ -65,12 +65,12 @@ int NodeWindow::show() {
       NodeOutput& start_output=nodeGraph.nodeOutputs.at(start_attr);
       Node& startnode=*start_output.source;
       int start_node_idx=start_attr-startnode.id-1;
-      const NodeProgramPortDescriptor& start_descriptor=startnode.getProgramDescriptor()->portDescriptors[start_node_idx];
+      const tn_PortDescriptor& start_descriptor=startnode.getProgramDescriptor()->portDescriptors[start_node_idx];
 
       NodeInput& end_input=nodeGraph.nodeInputs.at(end_attr);
       Node& endnode=*end_input.target;
       int end_node_idx=end_attr-endnode.id-1;
-      const NodeProgramPortDescriptor& end_descriptor=endnode.getProgramDescriptor()->portDescriptors[end_node_idx];
+      const tn_PortDescriptor& end_descriptor=endnode.getProgramDescriptor()->portDescriptors[end_node_idx];
 
       if(start_descriptor.type==end_descriptor.type) {
         nodeGraph.addLink(start_attr, end_attr);
@@ -95,7 +95,7 @@ int NodeWindow::show() {
       const ImVec2 click_pos = ImGui::GetMousePosOnOpeningCurrentPopup();
       int sourceNodeId=nodeGraph.nodeOutputs.at(dropped_link_id).source->id;
       int sourceOutputId=dropped_link_id-sourceNodeId-1;
-      NodeProgramPortType sourceOutputType=nodeGraph.nodeOutputs.at(dropped_link_id).source->getProgramDescriptor()->portDescriptors[sourceOutputId].type;
+      tn_PortType sourceOutputType=nodeGraph.nodeOutputs.at(dropped_link_id).source->getProgramDescriptor()->portDescriptors[sourceOutputId].type;
 
       auto match=npm.library.getProgramsWithInputType(sourceOutputType);
       for(auto& prog: match) {
@@ -103,7 +103,7 @@ int NodeWindow::show() {
           int newId=nodeGraph.addNode(prog)->id;
           ImNodes::SetNodeScreenSpacePos(newId, click_pos);
           for(int i=0; i<prog.desc->portCount; i++) {
-            if(prog.desc->portDescriptors[i].role==NodeProgramPortRoleInput
+            if(prog.desc->portDescriptors[i].role==tn_PortRoleInput
                && prog.desc->portDescriptors[i].type==sourceOutputType) {
               nodeGraph.addLink(dropped_link_id, newId+1+i);
               if(!npm.buildInvocationList()) {
@@ -149,7 +149,7 @@ int NodeWindow::show() {
         delNodes.push_back(&node.second);
       }
       ImGui::SameLine();
-      const NodeProgramDescriptor* program=node.second.getProgramDescriptor();
+      const tn_Descriptor* program=node.second.getProgramDescriptor();
       // ImGui::Text("%s [%i]", program->identifier, node.second.id);
       ImGui::Text("%s", program->identifier);
       ImNodes::EndNodeTitleBar();
@@ -164,21 +164,21 @@ int NodeWindow::show() {
         }
       }
       for(int i=0; i<program->portCount; i++) {
-        const NodeProgramPortDescriptor& portdesc=program->portDescriptors[i];
+        const tn_PortDescriptor& portdesc=program->portDescriptors[i];
         switch(portdesc.type) {
-        case NodeProgramPortTypeScalar:
+        case tn_PortTypeScalar:
           ImNodes::PushColorStyle(ImNodesCol_Pin, ImColor::HSV(0.58,0.79,1,0.7));
           ImNodes::PushColorStyle(ImNodesCol_PinHovered, ImColor::HSV(0.58,0.79,1,1));
         break;
-        case NodeProgramPortTypeSampleBlock:
+        case tn_PortTypeSampleBlock:
           ImNodes::PushColorStyle(ImNodesCol_Pin, ImColor::HSV(0.83,0.79,1,0.7));
           ImNodes::PushColorStyle(ImNodesCol_PinHovered, ImColor::HSV(0.83,0.79,1,1));
         break;
-        case NodeProgramPortTypeSpectrum:
+        case tn_PortTypeSpectrum:
           ImNodes::PushColorStyle(ImNodesCol_Pin, ImColor::HSV(0.33,0.79,1,0.7));
           ImNodes::PushColorStyle(ImNodesCol_PinHovered, ImColor::HSV(0.33,0.79,1,1));
         break;
-        case NodeProgramPortTypeShader:
+        case tn_PortTypeShader:
           ImNodes::PushColorStyle(ImNodesCol_Pin, ImColor::HSV(0.08,0.79,1,0.7));
           ImNodes::PushColorStyle(ImNodesCol_PinHovered, ImColor::HSV(0.08,0.79,1,1));
         break;
@@ -188,17 +188,17 @@ int NodeWindow::show() {
         }
 
         switch (portdesc.role) {
-          case NodeProgramPortRoleInput: {
+          case tn_PortRoleInput: {
             auto* source=nodeGraph.nodeInputs.at(node.second.id+1+i).source;
             ImNodes::PushAttributeFlag(ImNodesAttributeFlags_EnableLinkDetachWithDragClick);
             ImNodes::BeginInputAttribute(node.second.id+1+i);
             const auto& placeholderlist=node.second.getInstance().getPlaceholders();
             if(!source && i<placeholderlist->size() && placeholderlist->at(i).has_value()) {
               auto* placeholder=node.second.getInstance().getPlaceholders()->at(i).value().get();
-              if(portdesc.type==NodeProgramPortTypeShader) {
+              if(portdesc.type==tn_PortTypeShader) {
                 ImGui::ColorEdit4("Placeholder Color", (float*)placeholder, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel );
                 ImGui::SameLine();
-              } else if(portdesc.type==NodeProgramPortTypeScalar) {
+              } else if(portdesc.type==tn_PortTypeScalar) {
                 ImGui::SetNextItemWidth(20.0f);
                 ImGui::DragScalar("", ImGuiDataType_Double, (float*)placeholder, 0.1f);
                 ImGui::SameLine();
@@ -209,7 +209,7 @@ int NodeWindow::show() {
             ImNodes::PopAttributeFlag();
             break;
           }
-          case NodeProgramPortRoleOutput:
+          case tn_PortRoleOutput:
           ImNodes::BeginOutputAttribute(node.second.id+1+i);
           ImGui::TextUnformatted(portdesc.name);
           ImNodes::EndInputAttribute();
@@ -275,13 +275,13 @@ int NodeWindow::show() {
       Node* n=out->second.source;
       int oid=pinHovered-n->id-1;
       InStreamManager& ism=App::get().instreammanager;
-      const NodeProgramPortType type=n->getProgramDescriptor()->portDescriptors[oid].type;
-      if(type==NodeProgramPortTypeSampleBlock) {
+      const tn_PortType type=n->getProgramDescriptor()->portDescriptors[oid].type;
+      if(type==tn_PortTypeSampleBlock) {
         ImGui::BeginTooltip();
         auto buffers=*n->getInstance().getBuffers();
         ImGui::PlotLines("",(float*)buffers[oid].value().getAccessor()[-1],1024,0,nullptr,-1,1,ImVec2(300,100));
         ImGui::EndTooltip();
-      } else if(type==NodeProgramPortTypeSpectrum) {
+      } else if(type==tn_PortTypeSpectrum) {
         ImGui::BeginTooltip();
         if(ism.instreamInfo()) {
           auto buffers=*n->getInstance().getBuffers();
@@ -291,7 +291,7 @@ int NodeWindow::show() {
           ImGui::Text("no input active/samplerate unknown");
         }
         ImGui::EndTooltip();
-      } else if(type==NodeProgramPortTypeScalar) {
+      } else if(type==tn_PortTypeScalar) {
         ImGui::BeginTooltip();
         auto buffers=*n->getInstance().getBuffers();
         MultiBuffer::Accessor acc=buffers[oid].value().getAccessor();

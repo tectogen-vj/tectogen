@@ -17,6 +17,6 @@ public:
 };
 
 
-void invoke(NodeProgramHandle instance, NodeProgramState* state);
+void invoke(tn_Handle instance, tn_State* state);
 
 }

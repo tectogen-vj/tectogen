@@ -14,13 +14,13 @@ class NodeProgramLibrary
 {
 private:
   struct Entry {
-    std::unique_ptr<NodeProgramDescriptor> programDescriptor;
+    std::unique_ptr<tn_Descriptor> programDescriptor;
     std::unique_ptr<NodeProgramMetadata> metadata;
     NodeProgramType programType;
     std::vector<bool> hasInputType;
-    std::unique_ptr<NodeProgramPortDescriptor[]> portDescriptors;
+    std::unique_ptr<tn_PortDescriptor[]> portDescriptors;
     Entry(std::vector<bool>::size_type maxKnownInputType):
-      programDescriptor(std::make_unique<NodeProgramDescriptor>()),
+      programDescriptor(std::make_unique<tn_Descriptor>()),
       metadata(std::make_unique<NodeProgramMetadata>()),
       hasInputType(std::vector<bool>(maxKnownInputType+1, false)),
       programType(programDescriptor.get(), metadata.get())
@@ -34,11 +34,11 @@ private:
 public:
   NodeProgramLibrary();
   NodeProgramType addProgramType(const char* identifier,
-    std::initializer_list<NodeProgramPortDescriptor> portDescriptors,
-    void (*invokeFunction)(NodeProgramHandle handle, NodeProgramState* state),
-    NodeProgramHandle (*instantiateFunction)(const NodeProgramDescriptor* descriptor) = nullptr);
+    std::initializer_list<tn_PortDescriptor> portDescriptors,
+    void (*invokeFunction)(tn_Handle handle, tn_State* state),
+    tn_Handle (*instantiateFunction)(const tn_Descriptor* descriptor) = nullptr);
   void addFragmentShader(FragmentShader* frag);
-  std::vector<NodeProgramType> getProgramsWithInputType(NodeProgramPortType type);
+  std::vector<NodeProgramType> getProgramsWithInputType(tn_PortType type);
   std::vector<NodeProgramType> getPrograms();
   std::optional<NodeProgramType> getProgramByName(const char* name);
 

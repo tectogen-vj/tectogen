@@ -17,8 +17,8 @@
 
 void NodeProgramManager::loadTypes() {
   audioInType.emplace(library.addProgramType("Audio Input", {
-      {"audio", NodeProgramPortRoleOutput, NodeProgramPortTypeSampleBlock}
-    },[](NodeProgramHandle handle, NodeProgramState* state){
+      {"audio", tn_PortRoleOutput, tn_PortTypeSampleBlock}
+    },[](tn_Handle handle, tn_State* state){
       InStreamManager& ism=App::get().instreammanager;
       size_t bufsize=ism.blocksize*sizeof(float);
       void* payload=*state->portState[0].payload;
@@ -27,13 +27,13 @@ void NodeProgramManager::loadTypes() {
   // HACK
   audioInType->meta->type=NodeProgramMetadata::Type::Source;
   displayType.emplace(library.addProgramType("Display", {
-      {"visuals", NodeProgramPortRoleInput, NodeProgramPortTypeShader}
+      {"visuals", tn_PortRoleInput, tn_PortTypeShader}
     },nullptr));
 
   library.addProgramType("FFT", {
-      {"waveform", NodeProgramPortRoleInput, NodeProgramPortTypeSampleBlock},
-      {"spectrum", NodeProgramPortRoleOutput, NodeProgramPortTypeSpectrum}
-    },[](NodeProgramHandle handle, NodeProgramState* state){
+      {"waveform", tn_PortRoleInput, tn_PortTypeSampleBlock},
+      {"spectrum", tn_PortRoleOutput, tn_PortTypeSpectrum}
+    },[](tn_Handle handle, tn_State* state){
       if(state->portState[0].payload) {
         void* payload0=*(state->portState[0].payload);
         float* inbuf=(float*)(payload0);
@@ -52,9 +52,9 @@ void NodeProgramManager::loadTypes() {
   // https://web.media.mit.edu/~tristan/phd/dissertation/chapter3.html
   // E. Terhardt. Calculating virtual pitch. Hearing Research, 1:155–182, 1979.
   library.addProgramType("Equal Loudness", {
-      {"raw spectrum", NodeProgramPortRoleInput, NodeProgramPortTypeSpectrum},
-      {"eq spectrum", NodeProgramPortRoleOutput, NodeProgramPortTypeSpectrum}
-    },[](NodeProgramHandle handle, NodeProgramState* state){
+      {"raw spectrum", tn_PortRoleInput, tn_PortTypeSpectrum},
+      {"eq spectrum", tn_PortRoleOutput, tn_PortTypeSpectrum}
+    },[](tn_Handle handle, tn_State* state){
       if(state->portState[0].payload) {
         void* payload0=*(state->portState[0].payload);
         std::complex<float>* inbuf=(std::complex<float>*)(payload0);
@@ -73,9 +73,9 @@ void NodeProgramManager::loadTypes() {
   });
 
   library.addProgramType("sum", {
-      {"spectrum", NodeProgramPortRoleInput, NodeProgramPortTypeSpectrum},
-      {"sum", NodeProgramPortRoleOutput, NodeProgramPortTypeScalar}
-    },[](NodeProgramHandle handle, NodeProgramState* state){
+      {"spectrum", tn_PortRoleInput, tn_PortTypeSpectrum},
+      {"sum", tn_PortRoleOutput, tn_PortTypeScalar}
+    },[](tn_Handle handle, tn_State* state){
       if(state->portState[0].payload) {
         void* payload0=*(state->portState[0].payload);
         std::complex<float>* inbuf=(std::complex<float>*)(payload0);
@@ -178,7 +178,7 @@ bool NodeProgramManager::buildInvocationList() {
       for(int i=0; i<shadernode->in.size(); i++) {
         auto* input=shadernode->in[i];
         auto* pd=input->getPortDescriptor();
-        if(pd->type==NodeProgramPortTypeShader) {
+        if(pd->type==tn_PortTypeShader) {
           if(!input->source) {
             body<<", ";
             std::string identifier="_"+std::to_string(input->id)+"_placeholder";
@@ -188,7 +188,7 @@ bool NodeProgramManager::buildInvocationList() {
         }
 
         // Commented out: float inputs are uniforms
-        /*else if(pd->type==NodeProgramPortTypeScalar) {
+        /*else if(pd->type==tn_PortTypeScalar) {
           if(!input->source) {
             std::string identifier="_"+std::to_string(input->id)+"_placeholder";
             preamble<<"uniform float "<<identifier<<";\n";

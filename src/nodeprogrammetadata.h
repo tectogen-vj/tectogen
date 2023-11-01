@@ -19,8 +19,8 @@ struct NodeProgramMetadata {
 };
 
 struct NodeProgramType {
-  NodeProgramDescriptor* const desc;
+  tn_Descriptor* const desc;
   NodeProgramMetadata* const meta;
-  NodeProgramType(NodeProgramDescriptor* const desc, NodeProgramMetadata* const meta) :
+  NodeProgramType(tn_Descriptor* const desc, NodeProgramMetadata* const meta) :
     desc(desc), meta(meta) {}
 };
