@@ -5,6 +5,39 @@
 extern "C" {
 #endif
 
+#include <stddef.h>
+
+typedef struct tn_Complex {
+  float re;
+  float im;
+} tn_Complex;
+
+typedef struct tn_FrequencyWindow {
+  tn_Complex* buffer;
+  size_t count;
+} tn_FrequencyWindow;
+
+typedef struct tn_TimeWindow {
+  float* buffer;
+  size_t count;
+} tn_TimeWindow;
+
+typedef struct tn_Scalar {
+  double v;
+} tn_Scalar;
+
+typedef union {
+  tn_FrequencyWindow frequency_window;
+  tn_TimeWindow time_window;
+  tn_Scalar scalar;
+} tn_PortMessage;
+
+typedef struct tn_PortBuffer {
+  tn_PortMessage* ring_buffer;
+  size_t count;
+} tn_PortBuffer;
+
+
 typedef enum tn_PortRole {
   tn_PortRoleInput=1,
   tn_PortRoleOutput=2,
