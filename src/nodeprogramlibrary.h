@@ -35,8 +35,8 @@ public:
   NodeProgramLibrary();
   NodeProgramType addProgramType(const char* identifier,
     std::initializer_list<tn_PortDescriptor> portDescriptors,
-    void (*invokeFunction)(tn_Handle handle, tn_State* state),
-    tn_Handle (*instantiateFunction)(const tn_Descriptor* descriptor) = nullptr);
+                                 tn_invoke_function invokeFunction,
+                                 tn_instantiate_function instantiateFunction = nullptr);
   void addFragmentShader(FragmentShader* frag);
   std::vector<NodeProgramType> getProgramsWithInputType(tn_PortType type);
   std::vector<NodeProgramType> getPrograms();

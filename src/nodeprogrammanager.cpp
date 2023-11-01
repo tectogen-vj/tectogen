@@ -18,7 +18,7 @@
 void NodeProgramManager::loadTypes() {
   audioInType.emplace(library.addProgramType("Audio Input", {
       {"audio", tn_PortRoleOutput, tn_PortTypeSampleBlock}
-    },[](tn_Handle handle, tn_State* state){
+                                             },[](tn_Userdata handle, tn_State* state){
       InStreamManager& ism=App::get().instreammanager;
       size_t bufsize=ism.blocksize*sizeof(float);
                         void* payload=*state->portState[0].payload_symbol_to_be_obsoleted;
@@ -33,7 +33,7 @@ void NodeProgramManager::loadTypes() {
   library.addProgramType("FFT", {
       {"waveform", tn_PortRoleInput, tn_PortTypeSampleBlock},
       {"spectrum", tn_PortRoleOutput, tn_PortTypeSpectrum}
-    },[](tn_Handle handle, tn_State* state){
+                         },[](tn_Userdata handle, tn_State* state){
     if(state->portState[0].payload_symbol_to_be_obsoleted) {
       void* payload0=*(state->portState[0].payload_symbol_to_be_obsoleted);
         float* inbuf=(float*)(payload0);
@@ -54,7 +54,7 @@ void NodeProgramManager::loadTypes() {
   library.addProgramType("Equal Loudness", {
       {"raw spectrum", tn_PortRoleInput, tn_PortTypeSpectrum},
       {"eq spectrum", tn_PortRoleOutput, tn_PortTypeSpectrum}
-    },[](tn_Handle handle, tn_State* state){
+                         },[](tn_Userdata handle, tn_State* state){
     if(state->portState[0].payload_symbol_to_be_obsoleted) {
       void* payload0=*(state->portState[0].payload_symbol_to_be_obsoleted);
         std::complex<float>* inbuf=(std::complex<float>*)(payload0);
@@ -75,7 +75,7 @@ void NodeProgramManager::loadTypes() {
   library.addProgramType("sum", {
       {"spectrum", tn_PortRoleInput, tn_PortTypeSpectrum},
       {"sum", tn_PortRoleOutput, tn_PortTypeScalar}
-    },[](tn_Handle handle, tn_State* state){
+                         },[](tn_Userdata handle, tn_State* state){
     if(state->portState[0].payload_symbol_to_be_obsoleted) {
       void* payload0=*(state->portState[0].payload_symbol_to_be_obsoleted);
         std::complex<float>* inbuf=(std::complex<float>*)(payload0);
@@ -145,7 +145,7 @@ bool NodeProgramManager::buildInvocationList() {
     if(fragmentNodeUserdata) {
       delete fragmentNodeUserdata;
     }
-    fragmentNode.getProgramState()->userdata=new ShaderNodeProgram::Userdata();
+    fragmentNode.getProgramState()->userdata=(void**)new ShaderNodeProgram::Userdata(); // HACK
   }
   while(!outzero.empty()) {
     Node* node=outzero.back();
@@ -254,7 +254,7 @@ bool NodeProgramManager::buildInvocationList() {
         dp=(DisplayPayload*)node->getInstance().getProgramState()->userdata;
       } else {
         dp=new DisplayPayload();
-        node->getInstance().getProgramState()->userdata=dp;
+        node->getInstance().getProgramState()->userdata=(void**)dp;
       }
       dp->inv.program=program;
       dp->inv.shader=shader_object_id;

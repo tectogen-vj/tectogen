@@ -7,19 +7,14 @@ extern "C" {
 
 #include <stddef.h>
 
-typedef struct tn_Complex {
-  float re;
-  float im;
-} tn_Complex;
+typedef float tn_Complex[2];
 
 typedef struct tn_FrequencyWindow {
   tn_Complex* buffer;
-  size_t count;
 } tn_FrequencyWindow;
 
 typedef struct tn_TimeWindow {
   float* buffer;
-  size_t count;
 } tn_TimeWindow;
 
 typedef struct tn_Scalar {
@@ -52,7 +47,7 @@ typedef enum tn_PortType {
   tn_PortTypeShader=11
 } tn_PortType;
 
-typedef void* tn_Handle;
+typedef void* tn_Userdata;
 
 typedef struct tn_PortDescriptor {
   const char* name;
@@ -62,24 +57,34 @@ typedef struct tn_PortDescriptor {
 
 typedef struct tn_PortState {
   void** payload_symbol_to_be_obsoleted;
+  tn_PortBuffer portData;
 } tn_PortState;
+
+typedef struct tn_Config {
+  const int windowSize;
+  const int freqBins; // windowSize/2+1
+  const int lookbackCount;
+} tn_Config;
 
 typedef struct tn_Descriptor tn_Descriptor; // foward decl.
 
 typedef struct tn_State {
   tn_PortState* portState;
-  void* userdata;
+  tn_Userdata* userdata;
   const tn_Descriptor* descriptor;
+  const tn_Config* config;
   const int instanceId;
 } tn_State;
+
+typedef tn_Userdata (*tn_instantiate_function)(const tn_Descriptor* descriptor, const tn_Config* config);
+typedef void (*tn_invoke_function)(tn_Userdata instance, tn_State* state);
 
 typedef struct tn_Descriptor {
   const char * identifier;
   unsigned int portCount;
   const tn_PortDescriptor* portDescriptors;
-  void* userdata;
-  tn_Handle (*instantiate)(const tn_Descriptor* descriptor);
-  void (*invoke)(tn_Handle instance, tn_State* state);
+  tn_instantiate_function instantiate;
+  tn_invoke_function invoke;
 } tn_Descriptor;
 
 typedef const tn_Descriptor* (*tn_DescriptorLoader)(unsigned long index);

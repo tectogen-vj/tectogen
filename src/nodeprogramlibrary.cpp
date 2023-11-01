@@ -30,8 +30,8 @@ NodeProgramLibrary::NodeProgramLibrary() : maxKnownInputType(0) {
 
 NodeProgramType NodeProgramLibrary::addProgramType(const char* identifier,
     std::initializer_list<tn_PortDescriptor> portDescriptors,
-    void (*invokeFunction)(tn_Handle handle, tn_State* state),
-    tn_Handle (*instantiateFunction)(const tn_Descriptor* descriptor))
+                                                   tn_invoke_function invokeFunction,
+                                                   tn_instantiate_function instantiateFunction)
 {
   Entry newEntry(maxKnownInputType);
 

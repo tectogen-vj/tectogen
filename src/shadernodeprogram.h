@@ -17,6 +17,6 @@ public:
 };
 
 
-void invoke(tn_Handle instance, tn_State* state);
+void invoke(tn_Userdata instance, tn_State* state);
 
 }
