@@ -35,7 +35,7 @@ InStreamManager::InStreamManager():
    * fftw_malloc works here because the nodes' buffers are create using the
    * ffw_malloc allocator. */
   void* measureBuffer=fftw_malloc(sizeof(fftwf_complex)*fftElem);
-  fftPlan=fftwf_plan_dft_r2c_1d(blocksize, inStreamBuffer.writep(), (fftwf_complex*)measureBuffer, FFTW_MEASURE);
+  fftPlan=fftwf_plan_dft_r2c_1d(blocksize, inStreamBuffer.writep(), (fftwf_complex*)measureBuffer, FFTW_ESTIMATE);
   fftw_free(measureBuffer);
 }
 
