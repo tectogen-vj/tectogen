@@ -50,7 +50,7 @@ void NodeProgramManager::loadTypes() {
   });
 
   // https://web.media.mit.edu/~tristan/phd/dissertation/chapter3.html
-  // E. Terhardt. Calculating virtual pitch. Hearing Research, 1:155–182, 1979.
+  // E. Terhardt. Calculating virtual pitch. Hearing Research, 1:155-182, 1979.
   library.addProgramType("Equal Loudness", {
       {"raw spectrum", tn_PortRoleInput, tn_PortTypeSpectrum},
       {"eq spectrum", tn_PortRoleOutput, tn_PortTypeSpectrum}
