@@ -18,10 +18,11 @@
 void NodeProgramManager::loadTypes() {
   audioInType.emplace(library.addProgramType("Audio Input", {
       {"audio", tn_PortRoleOutput, tn_PortTypeSampleBlock}
-                                             },[](tn_Userdata handle, tn_State* state){
+},[](tn_State* state, unsigned long idx)
+	{
       InStreamManager& ism=App::get().instreammanager;
-      size_t bufsize=ism.blocksize*sizeof(float);
-                        void* payload=*state->portState[0].payload_symbol_to_be_obsoleted;
+			size_t bufsize=ism.blocksize*sizeof(float);
+			void* payload=tn_getPM(state->portState[0], idx).raw;
       memcpy(payload, (void*)ism.inStreamBuffer.newest(), bufsize);
   }));
   // HACK
@@ -33,20 +34,21 @@ void NodeProgramManager::loadTypes() {
   library.addProgramType("FFT", {
       {"waveform", tn_PortRoleInput, tn_PortTypeSampleBlock},
       {"spectrum", tn_PortRoleOutput, tn_PortTypeSpectrum}
-                         },[](tn_Userdata handle, tn_State* state){
-    if(state->portState[0].payload_symbol_to_be_obsoleted) {
-      void* payload0=*(state->portState[0].payload_symbol_to_be_obsoleted);
-        float* inbuf=(float*)(payload0);
-        void* payload1=*(state->portState[1].payload_symbol_to_be_obsoleted);
-        fftwf_complex* outbuf=(fftwf_complex*)payload1;
+                         },[](tn_State* state, unsigned long idx){
+		if(state->portState[0].portData.ring_buffer) { // FIXME: Ensure no such test is needed anymore
+			void* payload0=tn_getPM(state->portState[0], idx).raw;
+			void* payload1=tn_getPM(state->portState[1], idx).raw;
 
-        fftwf_plan& fftPlan=App::get().instreammanager.fftPlan;
-        fftwf_execute_dft_r2c(
-              fftPlan,
-              inbuf,
-              outbuf
-              );
-      }
+			float* inbuf=(float*)(payload0);
+			fftwf_complex* outbuf=(fftwf_complex*)payload1;
+
+			fftwf_plan& fftPlan=App::get().instreammanager.fftPlan;
+			fftwf_execute_dft_r2c(
+						fftPlan,
+						inbuf,
+						outbuf
+						);
+		}
   });
 
   // https://web.media.mit.edu/~tristan/phd/dissertation/chapter3.html
@@ -54,40 +56,32 @@ void NodeProgramManager::loadTypes() {
   library.addProgramType("Equal Loudness", {
       {"raw spectrum", tn_PortRoleInput, tn_PortTypeSpectrum},
       {"eq spectrum", tn_PortRoleOutput, tn_PortTypeSpectrum}
-                         },[](tn_Userdata handle, tn_State* state){
-    if(state->portState[0].payload_symbol_to_be_obsoleted) {
-      void* payload0=*(state->portState[0].payload_symbol_to_be_obsoleted);
-        std::complex<float>* inbuf=(std::complex<float>*)(payload0);
-        void* payload1=*(state->portState[1].payload_symbol_to_be_obsoleted);
-        std::complex<float>* outbuf=(std::complex<float>*)payload1;
+												 },[](tn_State* state, unsigned long idx){
+		std::complex<float>* inbuf =(std::complex<float>*)tn_getPM(state->portState[0], idx).frequency_window.buffer;
+		std::complex<float>* outbuf=(std::complex<float>*)tn_getPM(state->portState[1], idx).frequency_window.buffer;
 
-        InStreamManager& ism=App::get().instreammanager;
-        const int fftElem=ism.fftElem;
+		InStreamManager& ism=App::get().instreammanager;
+		const int fftElem=ism.fftElem;
 
-        for (int k = 0; k < fftElem; ++k) {
-          double fkhz=(ism.sample_rate*0.001)*k/(2.*(fftElem-1));
-          double att=-3.64 * pow(fkhz, -0.8) + 6.5 * exp(-0.6 * pow(fkhz - 3.3, 2)) - 0.001 * pow(fkhz, 4);
-          outbuf[k]=inbuf[k] * (float)pow(10, att / 20);;
-        }
-      }
+		for (int k = 0; k < fftElem; ++k) {
+			double fkhz=(ism.sample_rate*0.001)*k/(2.*(fftElem-1));
+			double att=-3.64 * pow(fkhz, -0.8) + 6.5 * exp(-0.6 * pow(fkhz - 3.3, 2)) - 0.001 * pow(fkhz, 4);
+			outbuf[k]=inbuf[k] * (float)pow(10, att / 20);;
+		}
   });
 
   library.addProgramType("sum", {
       {"spectrum", tn_PortRoleInput, tn_PortTypeSpectrum},
       {"sum", tn_PortRoleOutput, tn_PortTypeScalar}
-                         },[](tn_Userdata handle, tn_State* state){
-    if(state->portState[0].payload_symbol_to_be_obsoleted) {
-      void* payload0=*(state->portState[0].payload_symbol_to_be_obsoleted);
-        std::complex<float>* inbuf=(std::complex<float>*)(payload0);
-        void* payload1=*(state->portState[1].payload_symbol_to_be_obsoleted);
-        double* outbuf=(double*)payload1;
-        int fftElem=App::get().instreammanager.fftElem;
-        double a=0;
-        for (int k = 0; k < fftElem; ++k) {
-          a += std::abs(inbuf[k]);
-        }
-        *outbuf=a;
-      }
+												 },[](tn_State* state, unsigned long idx){
+			std::complex<float>* inbuf=(std::complex<float>*)tn_getPM(state->portState[0], idx).frequency_window.buffer;
+			double* outbuf=tn_getPM(state->portState[1], idx).scalar.v;
+			int fftElem=App::get().instreammanager.fftElem;
+			double a=0;
+			for (int k = 0; k < fftElem; ++k) {
+				a += std::abs(inbuf[k]);
+			}
+			*outbuf=a;
   });
 }
 
@@ -282,12 +276,7 @@ bool NodeProgramManager::buildInvocationList() {
       i.linkBuffers();
     }
     for(NodeProgramInstanceWrapper& i:buildInvocationList->list) {
-      i.linkBuffers();
-      for(std::optional<MultiBuffer>& j:*i.getBuffers()) {
-        if(j.has_value()) {
-          buildInvocationList->buffers.push_back(&j.value());
-        }
-      }
+			i.linkBuffers();
     }
 
     newInvocationList=std::move(buildInvocationList);

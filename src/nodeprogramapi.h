@@ -18,13 +18,14 @@ typedef struct tn_TimeWindow {
 } tn_TimeWindow;
 
 typedef struct tn_Scalar {
-  double v;
+	double* v;
 } tn_Scalar;
 
 typedef union {
   tn_FrequencyWindow frequency_window;
   tn_TimeWindow time_window;
   tn_Scalar scalar;
+	void* raw;
 } tn_PortMessage;
 
 typedef struct tn_PortBuffer {
@@ -70,24 +71,29 @@ typedef struct tn_Descriptor tn_Descriptor; // foward decl.
 
 typedef struct tn_State {
   tn_PortState* portState;
-  tn_Userdata* userdata;
+  tn_Userdata* userdata; // FIXME: populate
   const tn_Descriptor* descriptor;
   const tn_Config* config;
   const int instanceId;
 } tn_State;
 
 typedef tn_Userdata (*tn_instantiate_function)(const tn_Descriptor* descriptor, const tn_Config* config);
-typedef void (*tn_invoke_function)(tn_Userdata instance, tn_State* state);
+typedef void (*tn_invoke_function)(tn_State* state, unsigned long idx);
 
 typedef struct tn_Descriptor {
   const char * identifier;
   unsigned int portCount;
   const tn_PortDescriptor* portDescriptors;
-  tn_instantiate_function instantiate;
+  tn_instantiate_function instantiate; // FIXME: call it!
   tn_invoke_function invoke;
 } tn_Descriptor;
 
 typedef const tn_Descriptor* (*tn_DescriptorLoader)(unsigned long index);
+
+inline tn_PortMessage tn_getPM(tn_PortState port, unsigned long idx) {
+	int count=port.portData.count;
+	return port.portData.ring_buffer[idx%count];
+}
 
 #ifdef __cplusplus
 }

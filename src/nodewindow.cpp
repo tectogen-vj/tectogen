@@ -279,13 +279,13 @@ int NodeWindow::show() {
       if(type==tn_PortTypeSampleBlock) {
         ImGui::BeginTooltip();
         auto buffers=*n->getInstance().getBuffers();
-        ImGui::PlotLines("",(float*)buffers[oid].value().getAccessor()[-1],1024,0,nullptr,-1,1,ImVec2(300,100));
+				ImGui::PlotLines("",buffers[oid].value().ring_ptr[ism.ringIdx].time_window.buffer,1024,0,nullptr,-1,1,ImVec2(300,100));
         ImGui::EndTooltip();
       } else if(type==tn_PortTypeSpectrum) {
         ImGui::BeginTooltip();
         if(ism.instreamInfo()) {
           auto buffers=*n->getInstance().getBuffers();
-          std::complex<float>* arr=(std::complex<float>*)buffers[oid].value().getAccessor()[-1];
+					std::complex<float>* arr=(std::complex<float>*)buffers[oid].value().ring_ptr[ism.ringIdx].frequency_window.buffer;
           ImGui::PlotSpectrum("",arr, ism.fftElem, ism.instreamInfo()->sample_rate, NULL,0, 30, ImVec2(300,100));
         } else {
           ImGui::Text("no input active/samplerate unknown");
@@ -294,15 +294,16 @@ int NodeWindow::show() {
       } else if(type==tn_PortTypeScalar) {
         ImGui::BeginTooltip();
         auto buffers=*n->getInstance().getBuffers();
-        MultiBuffer::Accessor acc=buffers[oid].value().getAccessor();
+				auto ring=buffers[oid].value().ring_ptr;
+				std::tuple<std::vector<tn_PortMessage>, size_t> accDesc={ring, ism.ringIdx};
         ImGui::PlotLines("",[](void* data, int idx) -> float {
-            auto* a=(MultiBuffer::Accessor*) data;
-            void* ptr=(*a)[-idx-1];
-            auto* el=(double*)ptr;
-            float res=(float)*el;
-            return res;
-          }, (void*)&acc
-                         ,50,0,nullptr,FLT_MAX,FLT_MAX,ImVec2(300,100));
+						auto desc=(std::tuple<std::vector<tn_PortMessage>, size_t>*)data;
+						int startIdx=std::get<1>(*desc);
+						auto vec=std::get<0>(*desc);
+						int ringCount=vec.size();
+						return *vec[(startIdx+idx)%ringCount].scalar.v;
+					}, (void*)&accDesc
+												 ,ring.size(),0,nullptr,FLT_MAX,FLT_MAX,ImVec2(300,100));
         ImGui::EndTooltip();
       }
     }

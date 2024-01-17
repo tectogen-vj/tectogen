@@ -13,8 +13,7 @@
 
 class InvocationList {
 public:
-  std::vector<NodeProgramInstanceWrapper> list;
-  std::vector<MultiBuffer*> buffers;
+	std::vector<NodeProgramInstanceWrapper> list;
   std::vector<NodeProgramInstanceWrapper> displays;
   std::vector<NodeProgramInstanceWrapper> parametrizedFragments; // not part of "list" because these nodes need to wait for the video thread to finish as they set the uniform values
 };

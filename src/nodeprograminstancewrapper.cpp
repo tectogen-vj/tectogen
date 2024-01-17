@@ -17,36 +17,41 @@ NodeProgramInstanceWrapper::M::M(const Node &node) :
   node(node),
   descriptor(node.getProgramDescriptor()),
   portStateArr(node.getProgramDescriptor()->portCount),
-  state({.portState=portStateArr.data(),.userdata=nullptr,.descriptor=node.getProgramDescriptor(),.instanceId=node.id})
+	state({.portState=portStateArr.data(),.userdata=nullptr,.descriptor=node.getProgramDescriptor(),.instanceId=node.id}),
+	buffers(node.getProgramDescriptor()->portCount)
 {
   NodeGraph& ng=App::get().nodemanager.nodegraph;
+	auto lookbackFrames=App::get().lookbackFrames;
   for(int i=0; i<node.getProgramDescriptor()->portCount; i++) {
     const tn_PortDescriptor& portdesc=node.getProgramDescriptor()->portDescriptors[i];
-    if(portdesc.role==tn_PortRoleOutput) {
-      // make sure to emplace at index i, insert nullopts before
-      buffers.resize(i);
+		if(portdesc.role==tn_PortRoleOutput) {
       if(portdesc.type==tn_PortTypeSampleBlock) {
         size_t bufsize=App::get().instreammanager.blocksize*sizeof(float);
-        buffers.emplace_back(bufsize);
+				buffers[i].emplace(MultiBuffer{bufsize, lookbackFrames});
         state.portState[i].payload_symbol_to_be_obsoleted=buffers.back()->getWrite();
       } else if(portdesc.type==tn_PortTypeSpectrum) {
         size_t bufsize=App::get().instreammanager.fftAlign;
-        buffers.emplace_back(bufsize);
+				buffers[i].emplace(MultiBuffer{bufsize, lookbackFrames});
         state.portState[i].payload_symbol_to_be_obsoleted=buffers.back()->getWrite();
       } else if(portdesc.type==tn_PortTypeScalar) {
         size_t bufsize=sizeof(double);
-        buffers.emplace_back(bufsize);
+				buffers[i].emplace(MultiBuffer{bufsize, lookbackFrames});
         state.portState[i].payload_symbol_to_be_obsoleted=buffers.back()->getWrite();
       }
       NodeOutput& output=ng.nodeOutputs.at(node.id+i+1);
-    } else if (portdesc.role==tn_PortRoleInput) {
-      placeholders.resize(i);
+		} else if (portdesc.role==tn_PortRoleInput) {
+			placeholders.resize(i);
+			state.portState[i].portData.count=lookbackFrames;
       if(portdesc.type==tn_PortTypeShader) {
         placeholders.emplace_back(std::make_unique<uint8_t[]>(4*sizeof(float)));
       } else if(portdesc.type==tn_PortTypeScalar) {
         placeholders.emplace_back(std::make_unique<uint8_t[]>(sizeof(double)));
       }
-    }
+		}
+		if(buffers.back().has_value()) {
+			state.portState[i].portData.count=lookbackFrames;
+			state.portState[i].portData.ring_buffer=buffers.back().value().ring_ptr.data();
+		}
   }
 }
 
@@ -70,13 +75,19 @@ void NodeProgramInstanceWrapper::M::linkBuffers()
     if (portdesc.role==tn_PortRoleInput && portdesc.type!=tn_PortTypeShader) {
       // STYLE
       NodeInput& input=ng.nodeInputs.at(node.id+i+1);
-      NodeOutput* source=input.source;
+			NodeOutput* source=input.source;
       if(source) {
+				auto sourceNode=source->source;
         // FIXME: value none coredump when connecting shader with shader
         // FIXME: STYLE: split this up, add intermediates and methods to the Node* classes
-        state.portState[i].payload_symbol_to_be_obsoleted=source->source->getInstance().m->buffers[source->id-source->source->id-1].value().getWrite();
+				MultiBuffer& sourceNodeOutputBuffer=sourceNode->getInstance().m->buffers[source->id-source->source->id-1].value();
+				state.portState[i].payload_symbol_to_be_obsoleted=sourceNodeOutputBuffer.getWrite();
+
+				state.portState[i].portData.ring_buffer=sourceNodeOutputBuffer.ring_ptr.data();
       } else {
         state.portState[i].payload_symbol_to_be_obsoleted=nullptr;
+
+				state.portState[i].portData.ring_buffer=nullptr;
       }
     }
   }
@@ -89,7 +100,7 @@ NodeProgramInstanceWrapper::NodeProgramInstanceWrapper(const Node &node):
 NodeProgramInstanceWrapper::M::~M()
 {}
 
-void NodeProgramInstanceWrapper::invoke()
+void NodeProgramInstanceWrapper::invoke(unsigned long idx)
 {
-  m->descriptor->invoke(nullptr,&m->state);
+  m->descriptor->invoke(&m->state, idx);
 }

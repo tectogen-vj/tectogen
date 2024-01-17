@@ -1,6 +1,6 @@
 #include "shadernodeprogram.h"
 
-void ShaderNodeProgram::invoke(tn_Userdata instance, tn_State *state) {
+void ShaderNodeProgram::invoke(tn_State *state, unsigned long idx) {
   ShaderNodeProgram::Userdata* userdata=(ShaderNodeProgram::Userdata*)state->userdata;
   const tn_Descriptor* selfDesc=state->descriptor;
 

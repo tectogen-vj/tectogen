@@ -31,6 +31,7 @@ public:
    */
 public:
   const char* title="tectogen";
+	const int lookbackFrames=100;
   int run(int argc, char** argv);
   std::chrono::time_point<std::chrono::high_resolution_clock> startTime;
   InStreamManager instreammanager; // REFACTOR: Audio Component

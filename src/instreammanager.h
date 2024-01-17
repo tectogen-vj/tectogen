@@ -71,6 +71,24 @@ public: // public interface to be called from the main thread, must be safe towa
   const int fftElem; // The Number of complex elements of the fft result
   const int fftAlign; // The size in bytes of an fft buffer including padding, multiple of blocksize
 
+	/* FIXME: counting down frameIdx clearly isn't the sweetest solution
+	 * the idea was to fill the lookback ringbuffer in reverse to avoid the
+	 * corner case of frameIdx-lookback becoming negative which would break
+	 * access via ringBuf[(frameIdx-lookback)%ringCount].
+	 * A cleaner solution may be to instead have ringBuf in memory twice,
+	 * identically, allowing for ringBuf[(frameIdx%ringCount)-lookback]
+	 * to never go out of bounds.
+	 * It might also be nice update tn_invoke_function params to
+	 * (tn_State* state, tn_GlobalState* gstate) and pass both the current
+	 * tick and an actually valid ring index via gstate. This would assume
+	 * all rings to be of identical capacity/count, so this count could also
+	 * move to gstate.
+	 * the sizings of Sample- and SpectrumBlock could also go into gState
+	 * which would further simplify both the API and its usage.
+	 */
+	unsigned long int frameIdx=std::numeric_limits<decltype(frameIdx)>::max();
+	size_t ringIdx=0;
+
   int sample_rate;
 
   void start(SoundIoInStream *soundIoInStream);

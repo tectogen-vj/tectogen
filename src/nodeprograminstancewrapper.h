@@ -3,6 +3,7 @@
 #include "nodeprogramapi.h"
 
 #include "multibuffer.h"
+#include "portbuffer.h"
 
 #include <initializer_list>
 #include <memory>
@@ -24,7 +25,8 @@ private:
     *M(const M&) = delete;
     M(M&& a) noexcept;
     M& operator=(const M&) = delete;
-    std::vector<std::optional<MultiBuffer>> buffers;
+    std::vector<std::optional<MultiBuffer>> buffers; // TODO: obsolete
+    std::vector<std::unique_ptr<PortBuffer>> portBuffers;
     std::vector<std::optional<std::unique_ptr<uint8_t[]>>> placeholders; // HACK: instead introduce a playload type (polymorphic/union)
     void linkBuffers();
   };
@@ -39,7 +41,7 @@ public:
   /*NodeProgramInstanceWrapper(const NodeProgramInstanceWrapper&) = delete;
     NodeProgramInstanceWrapper(NodeProgramInstanceWrapper&& a) noexcept;
     NodeProgramInstanceWrapper& operator=(const NodeProgramInstanceWrapper&) = delete;*/
-  void invoke();
+  void invoke(unsigned long idx);
   inline std::vector<std::optional<MultiBuffer>>* getBuffers() {return &m->buffers;}
   inline std::vector<std::optional<std::unique_ptr<uint8_t[]>>>* getPlaceholders() {return &m->placeholders;}
   inline tn_State* getProgramState() {return &m->state;}
