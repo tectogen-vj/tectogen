@@ -3,7 +3,6 @@
 #include "nodeprogramapi.h"
 
 #include "multibuffer.h"
-#include "portbuffer.h"
 
 #include <initializer_list>
 #include <memory>
@@ -25,8 +24,7 @@ private:
     *M(const M&) = delete;
     M(M&& a) noexcept;
     M& operator=(const M&) = delete;
-    std::vector<std::optional<MultiBuffer>> buffers; // TODO: obsolete
-    std::vector<std::unique_ptr<PortBuffer>> portBuffers;
+		std::vector<std::optional<MultiBuffer>> buffers; // TODO: obsolete
     std::vector<std::optional<std::unique_ptr<uint8_t[]>>> placeholders; // HACK: instead introduce a playload type (polymorphic/union)
     void linkBuffers();
   };
