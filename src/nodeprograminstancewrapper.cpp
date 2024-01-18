@@ -48,9 +48,9 @@ NodeProgramInstanceWrapper::M::M(const Node &node) :
         placeholders.emplace_back(std::make_unique<uint8_t[]>(sizeof(double)));
       }
 		}
-		if(buffers.back().has_value()) {
+		if(buffers[i].has_value()) {
 			state.portState[i].portData.count=lookbackFrames;
-			state.portState[i].portData.ring_buffer=buffers.back().value().ring_ptr.data();
+			state.portState[i].portData.ring_buffer=buffers[i].value().ring_ptr.data();
 		}
   }
 }

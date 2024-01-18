@@ -8,6 +8,7 @@
 #include "ringbuffer.h"
 #include "shadernodeprogram.h"
 
+#include <algorithm>
 #include <cstring>
 #include <memory>
 #include <unordered_map>
@@ -30,6 +31,10 @@ void NodeProgramManager::loadTypes() {
   displayType.emplace(library.addProgramType("Display", {
       {"visuals", tn_PortRoleInput, tn_PortTypeShader}
     },nullptr));
+
+	library.addProgramType(plotIdentifier, {
+			{"scalar", tn_PortRoleInput, tn_PortTypeScalar}
+		},nullptr);
 
   library.addProgramType("FFT", {
       {"waveform", tn_PortRoleInput, tn_PortTypeSampleBlock},
@@ -70,6 +75,77 @@ void NodeProgramManager::loadTypes() {
 		}
   });
 
+	library.addProgramType("Harmonic-Percussive-Separation", {
+			{"input", tn_PortRoleInput, tn_PortTypeSpectrum},
+			{"harmonic", tn_PortRoleOutput, tn_PortTypeSpectrum},
+			{"percussive", tn_PortRoleOutput, tn_PortTypeSpectrum}
+												 },[](tn_State* state, unsigned long idx){
+		if(state->portState[0].portData.ring_buffer) { // FIXME: Ensure no such test is needed anymore
+			std::complex<float>* input     =(std::complex<float>*)tn_getPM(state->portState[0], idx).frequency_window.buffer;
+			std::complex<float>* harmonic  =(std::complex<float>*)tn_getPM(state->portState[1], idx).frequency_window.buffer;
+			std::complex<float>* percussive=(std::complex<float>*)tn_getPM(state->portState[2], idx).frequency_window.buffer;
+
+			int fftElem=App::get().instreammanager.fftElem;
+
+			{ // Harmonic–Percussive Separation (HPS)
+					const int lh=9; //=13;
+					const int lp=29; //=9;
+					for (int k = 0; k < fftElem; ++k) {
+							// calculate vertical median y_p
+							float y_p=0;
+							{
+									int left = std::max(0, k-lp/2);
+									left = std::min(left, fftElem-k-1);
+									float tmp_arr[fftElem]; // sized to theoretic max because lp is variable
+									for (int i=0; i<lp; i++) {
+											tmp_arr[i]=std::abs(input[left+i]);
+									}
+									std::nth_element(tmp_arr, tmp_arr+lp/2, tmp_arr+lp);
+									y_p = tmp_arr[lp/2];
+							}
+							// calculate horizontal median y_h
+							float y_h=0;
+							{
+									float tmp_arr[lh];
+									for (int i=0; i<lh; i++) {
+										auto lookback=(std::complex<float>*)tn_getPM(state->portState[0], idx+i).frequency_window.buffer;
+										tmp_arr[i]=std::abs(lookback[k]);
+									}
+									std::nth_element(tmp_arr, tmp_arr+lh/2, tmp_arr+lh);
+									y_h = tmp_arr[lh/2];
+							}
+
+							const float eps=0.01;
+
+							// calculate the vertical weighting function M_p
+							float M_p=(y_p+eps/2)/(y_h+y_p+eps);
+
+							// calculate the horizontal weighting function M_h
+							float M_h=(y_h+eps/2)/(y_h+y_p+eps);
+
+							harmonic[k]  =input[k]*M_h;
+							percussive[k]=input[k]*M_p;
+					}
+				}
+			}
+	});
+
+	// flux a.k.a. spectrum energy
+	library.addProgramType("flux", {
+			{"spectrum", tn_PortRoleInput, tn_PortTypeSpectrum},
+			{"flux", tn_PortRoleOutput, tn_PortTypeScalar}
+												 },[](tn_State* state, unsigned long idx){
+			std::complex<float>* current=(std::complex<float>*)tn_getPM(state->portState[0], idx  ).frequency_window.buffer;
+			std::complex<float>* last   =(std::complex<float>*)tn_getPM(state->portState[0], idx+1).frequency_window.buffer;
+			double* outbuf=tn_getPM(state->portState[1], idx).scalar.v;
+			int fftElem=App::get().instreammanager.fftElem;
+			double a=0;
+			for (int k = 0; k < fftElem; ++k) {
+				a += std::abs(current[k])-std::abs(last[k]);
+			}
+			*outbuf=a;
+	});
+
   library.addProgramType("sum", {
       {"spectrum", tn_PortRoleInput, tn_PortTypeSpectrum},
       {"sum", tn_PortRoleOutput, tn_PortTypeScalar}
@@ -109,7 +185,8 @@ bool NodeProgramManager::buildInvocationList() {
     Node* node=inzero.back();
     inzero.pop_back();
     auto type=node->getProgramType().meta->type;
-    if(type!=NodeProgramMetadata::Type::PixelShader && type!=NodeProgramMetadata::Type::CoordShader) {
+		//if(type!=NodeProgramMetadata::Type::PixelShader && type!=NodeProgramMetadata::Type::CoordShader) {
+		if(type==NodeProgramMetadata::Type::Runnable || type==NodeProgramMetadata::Type::Source) {
       buildInvocationList->list.push_back(node->getInstance());
       Logs::get().logf(logSeverity_Debug,"Nodegraph", "%i", node->id);
       for(NodeOutput* out: node->out) {

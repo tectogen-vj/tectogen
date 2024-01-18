@@ -91,8 +91,9 @@ typedef struct tn_Descriptor {
 typedef const tn_Descriptor* (*tn_DescriptorLoader)(unsigned long index);
 
 inline tn_PortMessage tn_getPM(tn_PortState port, unsigned long idx) {
-	int count=port.portData.count;
-	return port.portData.ring_buffer[idx%count];
+	unsigned long count=port.portData.count;
+	int rIdx=idx%count;
+	return port.portData.ring_buffer[rIdx];
 }
 
 #ifdef __cplusplus
