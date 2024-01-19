@@ -159,6 +159,17 @@ void NodeProgramManager::loadTypes() {
 			}
 			*outbuf=a;
   });
+
+	library.addProgramType("integral", {
+			{"in", tn_PortRoleInput, tn_PortTypeScalar},
+			{"out", tn_PortRoleOutput, tn_PortTypeScalar}
+												 },[](tn_State* state, unsigned long idx){
+			double* inbuf  =tn_getPM(state->portState[0], idx).scalar.v;
+			double* outbuf =tn_getPM(state->portState[1], idx).scalar.v;
+			double* lastout=tn_getPM(state->portState[1], idx+1).scalar.v;
+
+			*outbuf=*lastout + *inbuf;
+	});
 }
 
 bool NodeProgramManager::buildInvocationList() {
