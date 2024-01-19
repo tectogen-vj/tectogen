@@ -71,7 +71,7 @@ typedef struct tn_Descriptor tn_Descriptor; // foward decl.
 
 typedef struct tn_State {
   tn_PortState* portState;
-  tn_Userdata* userdata; // FIXME: populate
+	tn_Userdata userdata;
   const tn_Descriptor* descriptor;
   const tn_Config* config;
   const int instanceId;

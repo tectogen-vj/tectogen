@@ -53,6 +53,9 @@ NodeProgramInstanceWrapper::M::M(const Node &node) :
 			state.portState[i].portData.ring_buffer=buffers[i].value().ring_ptr.data();
 		}
   }
+	if(auto instantiateFunc=node.getProgramDescriptor()->instantiate) { // FIXME: Needs deinstatiate or resource leak
+		state.userdata=instantiateFunc(node.getProgramDescriptor(), state.config);
+	}
 }
 
 NodeProgramInstanceWrapper::M::M(M &&a) noexcept :
