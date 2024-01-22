@@ -25,14 +25,14 @@ using fftw_vector = std::vector<T, fftw_allocator<T>>;
 class MultiBuffer
 {
 public:
-	const int ringCount;
-	// A pointer to each element within the ring buffer to ease access from within a node program (receives this buffer as the ring_buffer member of tn_PortBuffer)
-	std::vector<tn_PortMessage> ring_ptr;
+  const int ringCount;
+  // A pointer to each element within the ring buffer to ease access from within a node program (receives this buffer as the ring_buffer member of tn_PortBuffer)
+  std::vector<tn_PortMessage> ring_ptr;
 protected:
   const size_t bufsize;
   size_t idx=0;
   fftw_vector<uint8_t> buf;
-	void* ptr;
+  void* ptr;
 
 public:
   class Accessor {
@@ -59,7 +59,7 @@ public:
       }
     }
   };
-	MultiBuffer(size_t bufsize, int lookbackFrames);
+  MultiBuffer(size_t bufsize, int lookbackFrames);
   inline void** getWrite() {
     return &ptr;
   }

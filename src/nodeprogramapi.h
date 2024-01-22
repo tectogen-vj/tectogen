@@ -18,14 +18,14 @@ typedef struct tn_TimeWindow {
 } tn_TimeWindow;
 
 typedef struct tn_Scalar {
-	double* v;
+  double* v;
 } tn_Scalar;
 
 typedef union {
   tn_FrequencyWindow frequency_window;
   tn_TimeWindow time_window;
   tn_Scalar scalar;
-	void* raw;
+  void* raw;
 } tn_PortMessage;
 
 typedef struct tn_PortBuffer {
@@ -71,7 +71,7 @@ typedef struct tn_Descriptor tn_Descriptor; // foward decl.
 
 typedef struct tn_State {
   tn_PortState* portState;
-	tn_Userdata userdata;
+  tn_Userdata userdata;
   const tn_Descriptor* descriptor;
   const tn_Config* config;
   const int instanceId;
@@ -91,9 +91,9 @@ typedef struct tn_Descriptor {
 typedef const tn_Descriptor* (*tn_DescriptorLoader)(unsigned long index);
 
 inline tn_PortMessage tn_getPM(tn_PortState port, unsigned long idx) {
-	unsigned long count=port.portData.count;
-	int rIdx=idx%count;
-	return port.portData.ring_buffer[rIdx];
+  unsigned long count=port.portData.count;
+  int rIdx=idx%count;
+  return port.portData.ring_buffer[rIdx];
 }
 
 #ifdef __cplusplus

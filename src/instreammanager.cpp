@@ -122,7 +122,7 @@ void InStreamManager::analysisThreadFunc() {
     inputBlockCV.wait(lock);
     inStreamBuffer.sync();
     if(running && inStreamBuffer.hasData() && !terminate) {
-			inStreamBuffer.advanceReadPtrBlock();
+      inStreamBuffer.advanceReadPtrBlock();
 
       auto& nodemgr=App::get().nodemanager;
       if(nodemgr.newInvocationList) {
@@ -132,18 +132,18 @@ void InStreamManager::analysisThreadFunc() {
       }
       InvocationList* invocationListPtr=nodemgr.invocationList.load();
       if(invocationListPtr) {
-				std::vector<NodeProgramInstanceWrapper>& ivl=invocationListPtr->list;
+        std::vector<NodeProgramInstanceWrapper>& ivl=invocationListPtr->list;
         for(NodeProgramInstanceWrapper& inv:ivl) {
-					inv.invoke(frameIdx-1);
+          inv.invoke(frameIdx-1);
         }
-				frameIdx-=1;
-				ringIdx=frameIdx%App::get().lookbackFrames;
+        frameIdx-=1;
+        ringIdx=frameIdx%App::get().lookbackFrames;
 
         // Todo: Wait for renderer to finish here!
 
         for(NodeProgramInstanceWrapper& inv:invocationListPtr->parametrizedFragments) {
-					inv.invoke(frameIdx);
-				}
+          inv.invoke(frameIdx);
+        }
 
         std::vector<NodeProgramInstanceWrapper>& displays=invocationListPtr->displays;
         auto& video=App::get().video;

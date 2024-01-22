@@ -162,92 +162,92 @@ int NodeWindow::show() {
           ImGui::Button("Preview Box", ImVec2(160, 120));
         //
         }
-			}
+      }
 
-			if(node.second.getProgramType().desc->identifier==npm.plotIdentifier) {
-				ImNodes::PushColorStyle(ImNodesCol_Pin, ImColor::HSV(0.58,0.79,1,0.7));
-				ImNodes::PushColorStyle(ImNodesCol_PinHovered, ImColor::HSV(0.58,0.79,1,1));
-				ImNodes::PushAttributeFlag(ImNodesAttributeFlags_EnableLinkDetachWithDragClick);
-				ImNodes::BeginInputAttribute(node.second.id+1);
-				if(node.second.in[0]->source) {
-					Node* n=node.second.in[0]->source->source;
-					int oid=node.second.in[0]->source->id-n->id-1;
-					InStreamManager& ism=App::get().instreammanager;
+      if(node.second.getProgramType().desc->identifier==npm.plotIdentifier) {
+        ImNodes::PushColorStyle(ImNodesCol_Pin, ImColor::HSV(0.58,0.79,1,0.7));
+        ImNodes::PushColorStyle(ImNodesCol_PinHovered, ImColor::HSV(0.58,0.79,1,1));
+        ImNodes::PushAttributeFlag(ImNodesAttributeFlags_EnableLinkDetachWithDragClick);
+        ImNodes::BeginInputAttribute(node.second.id+1);
+        if(node.second.in[0]->source) {
+          Node* n=node.second.in[0]->source->source;
+          int oid=node.second.in[0]->source->id-n->id-1;
+          InStreamManager& ism=App::get().instreammanager;
 
-					auto buffers=*n->getInstance().getBuffers();
-					auto ring=buffers[oid].value().ring_ptr;
-					std::tuple<std::vector<tn_PortMessage>, size_t> accDesc={ring, ism.ringIdx};
-					ImGui::PlotLines("",[](void* data, int idx) -> float {
-							auto desc=(std::tuple<std::vector<tn_PortMessage>, size_t>*)data;
-							int startIdx=std::get<1>(*desc);
-							auto vec=std::get<0>(*desc);
-							int ringCount=vec.size();
-							return *vec[(startIdx+idx)%ringCount].scalar.v;
-						}, (void*)&accDesc
-													 ,ring.size(),0,nullptr,FLT_MAX,FLT_MAX,ImVec2(300,100));
+          auto buffers=*n->getInstance().getBuffers();
+          auto ring=buffers[oid].value().ring_ptr;
+          std::tuple<std::vector<tn_PortMessage>, size_t> accDesc={ring, ism.ringIdx};
+          ImGui::PlotLines("",[](void* data, int idx) -> float {
+              auto desc=(std::tuple<std::vector<tn_PortMessage>, size_t>*)data;
+              int startIdx=std::get<1>(*desc);
+              auto vec=std::get<0>(*desc);
+              int ringCount=vec.size();
+              return *vec[(startIdx+idx)%ringCount].scalar.v;
+            }, (void*)&accDesc
+                           ,ring.size(),0,nullptr,FLT_MAX,FLT_MAX,ImVec2(300,100));
 
-				}
-				ImNodes::EndInputAttribute();
-				ImNodes::PopAttributeFlag();
-				ImNodes::PopColorStyle();
-			} else {
-				for(int i=0; i<program->portCount; i++) {
-					const tn_PortDescriptor& portdesc=program->portDescriptors[i];
-					switch(portdesc.type) {
-					case tn_PortTypeScalar:
-						ImNodes::PushColorStyle(ImNodesCol_Pin, ImColor::HSV(0.58,0.79,1,0.7));
-						ImNodes::PushColorStyle(ImNodesCol_PinHovered, ImColor::HSV(0.58,0.79,1,1));
-					break;
-					case tn_PortTypeSampleBlock:
-						ImNodes::PushColorStyle(ImNodesCol_Pin, ImColor::HSV(0.83,0.79,1,0.7));
-						ImNodes::PushColorStyle(ImNodesCol_PinHovered, ImColor::HSV(0.83,0.79,1,1));
-					break;
-					case tn_PortTypeSpectrum:
-						ImNodes::PushColorStyle(ImNodesCol_Pin, ImColor::HSV(0.33,0.79,1,0.7));
-						ImNodes::PushColorStyle(ImNodesCol_PinHovered, ImColor::HSV(0.33,0.79,1,1));
-					break;
-					case tn_PortTypeShader:
-						ImNodes::PushColorStyle(ImNodesCol_Pin, ImColor::HSV(0.08,0.79,1,0.7));
-						ImNodes::PushColorStyle(ImNodesCol_PinHovered, ImColor::HSV(0.08,0.79,1,1));
-					break;
-					default:
-						ImNodes::PushColorStyle(ImNodesCol_Pin, IM_COL32(0,255,0,255));
-					break;
-					}
+        }
+        ImNodes::EndInputAttribute();
+        ImNodes::PopAttributeFlag();
+        ImNodes::PopColorStyle();
+      } else {
+        for(int i=0; i<program->portCount; i++) {
+          const tn_PortDescriptor& portdesc=program->portDescriptors[i];
+          switch(portdesc.type) {
+          case tn_PortTypeScalar:
+            ImNodes::PushColorStyle(ImNodesCol_Pin, ImColor::HSV(0.58,0.79,1,0.7));
+            ImNodes::PushColorStyle(ImNodesCol_PinHovered, ImColor::HSV(0.58,0.79,1,1));
+          break;
+          case tn_PortTypeSampleBlock:
+            ImNodes::PushColorStyle(ImNodesCol_Pin, ImColor::HSV(0.83,0.79,1,0.7));
+            ImNodes::PushColorStyle(ImNodesCol_PinHovered, ImColor::HSV(0.83,0.79,1,1));
+          break;
+          case tn_PortTypeSpectrum:
+            ImNodes::PushColorStyle(ImNodesCol_Pin, ImColor::HSV(0.33,0.79,1,0.7));
+            ImNodes::PushColorStyle(ImNodesCol_PinHovered, ImColor::HSV(0.33,0.79,1,1));
+          break;
+          case tn_PortTypeShader:
+            ImNodes::PushColorStyle(ImNodesCol_Pin, ImColor::HSV(0.08,0.79,1,0.7));
+            ImNodes::PushColorStyle(ImNodesCol_PinHovered, ImColor::HSV(0.08,0.79,1,1));
+          break;
+          default:
+            ImNodes::PushColorStyle(ImNodesCol_Pin, IM_COL32(0,255,0,255));
+          break;
+          }
 
-					switch (portdesc.role) {
-						case tn_PortRoleInput: {
-							auto* source=nodeGraph.nodeInputs.at(node.second.id+1+i).source;
-							ImNodes::PushAttributeFlag(ImNodesAttributeFlags_EnableLinkDetachWithDragClick);
-							ImNodes::BeginInputAttribute(node.second.id+1+i);
-							const auto& placeholderlist=node.second.getInstance().getPlaceholders();
-							if(!source && i<placeholderlist->size() && placeholderlist->at(i).has_value()) {
-								auto* placeholder=node.second.getInstance().getPlaceholders()->at(i).value().get();
-								if(portdesc.type==tn_PortTypeShader) {
-									ImGui::ColorEdit4("Placeholder Color", (float*)placeholder, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel );
-									ImGui::SameLine();
-								} else if(portdesc.type==tn_PortTypeScalar) {
-									ImGui::SetNextItemWidth(20.0f);
-									ImGui::DragScalar("", ImGuiDataType_Double, (float*)placeholder, 0.1f);
-									ImGui::SameLine();
-								}
-							}
-							ImGui::TextUnformatted(portdesc.name);
-							ImNodes::EndInputAttribute();
-							ImNodes::PopAttributeFlag();
-							break;
-						}
-						case tn_PortRoleOutput:
-						ImNodes::BeginOutputAttribute(node.second.id+1+i);
-						ImGui::TextUnformatted(portdesc.name);
-						ImNodes::EndInputAttribute();
-						default:
-						break;
-					}
-					ImNodes::PopColorStyle();
-				}
-			}
-			ImNodes::EndNode();
+          switch (portdesc.role) {
+            case tn_PortRoleInput: {
+              auto* source=nodeGraph.nodeInputs.at(node.second.id+1+i).source;
+              ImNodes::PushAttributeFlag(ImNodesAttributeFlags_EnableLinkDetachWithDragClick);
+              ImNodes::BeginInputAttribute(node.second.id+1+i);
+              const auto& placeholderlist=node.second.getInstance().getPlaceholders();
+              if(!source && i<placeholderlist->size() && placeholderlist->at(i).has_value()) {
+                auto* placeholder=node.second.getInstance().getPlaceholders()->at(i).value().get();
+                if(portdesc.type==tn_PortTypeShader) {
+                  ImGui::ColorEdit4("Placeholder Color", (float*)placeholder, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel );
+                  ImGui::SameLine();
+                } else if(portdesc.type==tn_PortTypeScalar) {
+                  ImGui::SetNextItemWidth(20.0f);
+                  ImGui::DragScalar("", ImGuiDataType_Double, (float*)placeholder, 0.1f);
+                  ImGui::SameLine();
+                }
+              }
+              ImGui::TextUnformatted(portdesc.name);
+              ImNodes::EndInputAttribute();
+              ImNodes::PopAttributeFlag();
+              break;
+            }
+            case tn_PortRoleOutput:
+            ImNodes::BeginOutputAttribute(node.second.id+1+i);
+            ImGui::TextUnformatted(portdesc.name);
+            ImNodes::EndInputAttribute();
+            default:
+            break;
+          }
+          ImNodes::PopColorStyle();
+        }
+      }
+      ImNodes::EndNode();
     }
 
     // TODO: Check implications of referencing a shared_ptr
@@ -308,13 +308,13 @@ int NodeWindow::show() {
       if(type==tn_PortTypeSampleBlock) {
         ImGui::BeginTooltip();
         auto buffers=*n->getInstance().getBuffers();
-				ImGui::PlotLines("",buffers[oid].value().ring_ptr[ism.ringIdx].time_window.buffer,1024,0,nullptr,-1,1,ImVec2(300,100));
+        ImGui::PlotLines("",buffers[oid].value().ring_ptr[ism.ringIdx].time_window.buffer,1024,0,nullptr,-1,1,ImVec2(300,100));
         ImGui::EndTooltip();
       } else if(type==tn_PortTypeSpectrum) {
         ImGui::BeginTooltip();
         if(ism.instreamInfo()) {
           auto buffers=*n->getInstance().getBuffers();
-					std::complex<float>* arr=(std::complex<float>*)buffers[oid].value().ring_ptr[ism.ringIdx].frequency_window.buffer;
+          std::complex<float>* arr=(std::complex<float>*)buffers[oid].value().ring_ptr[ism.ringIdx].frequency_window.buffer;
           ImGui::PlotSpectrum("",arr, ism.fftElem, ism.instreamInfo()->sample_rate, NULL,0, 30, ImVec2(300,100));
         } else {
           ImGui::Text("no input active/samplerate unknown");
@@ -323,16 +323,16 @@ int NodeWindow::show() {
       } else if(type==tn_PortTypeScalar) {
         ImGui::BeginTooltip();
         auto buffers=*n->getInstance().getBuffers();
-				auto ring=buffers[oid].value().ring_ptr;
-				std::tuple<std::vector<tn_PortMessage>, size_t> accDesc={ring, ism.ringIdx};
+        auto ring=buffers[oid].value().ring_ptr;
+        std::tuple<std::vector<tn_PortMessage>, size_t> accDesc={ring, ism.ringIdx};
         ImGui::PlotLines("",[](void* data, int idx) -> float {
-						auto desc=(std::tuple<std::vector<tn_PortMessage>, size_t>*)data;
-						int startIdx=std::get<1>(*desc);
-						auto vec=std::get<0>(*desc);
-						int ringCount=vec.size();
-						return *vec[(startIdx+idx)%ringCount].scalar.v;
-					}, (void*)&accDesc
-												 ,ring.size(),0,nullptr,FLT_MAX,FLT_MAX,ImVec2(300,100));
+            auto desc=(std::tuple<std::vector<tn_PortMessage>, size_t>*)data;
+            int startIdx=std::get<1>(*desc);
+            auto vec=std::get<0>(*desc);
+            int ringCount=vec.size();
+            return *vec[(startIdx+idx)%ringCount].scalar.v;
+          }, (void*)&accDesc
+                         ,ring.size(),0,nullptr,FLT_MAX,FLT_MAX,ImVec2(300,100));
         ImGui::EndTooltip();
       }
     }

@@ -50,7 +50,7 @@ NodeProgramType NodeProgramLibrary::addProgramType(const char* identifier,
     newEntry.metadata->type=NodeProgramMetadata::Type::Display;
   }
 
-	//assert(newEntry.metadata->type!=NodeProgramMetadata::Type::None);
+  //assert(newEntry.metadata->type!=NodeProgramMetadata::Type::None);
 
   newEntry.programDescriptor->invoke = invokeFunction;
   newEntry.programDescriptor->instantiate = instantiateFunction;
