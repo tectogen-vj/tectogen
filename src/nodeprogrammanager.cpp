@@ -16,6 +16,10 @@
 #include <utility>
 #include <sstream>
 
+double euclideanModulo(double dividend, double divisor) {
+    return fmod((fmod(dividend, divisor) + divisor), divisor);
+}
+
 void NodeProgramManager::loadTypes() {
   audioInType.emplace(library.addProgramType("Audio Input", {
       {"audio", tn_PortRoleOutput, tn_PortTypeSampleBlock}
@@ -159,6 +163,39 @@ void NodeProgramManager::loadTypes() {
         a += std::abs(inbuf[k]);
       }
       *outbuf=a;
+  });
+
+  library.addProgramType("peak harmonic", {
+      {"spectrum", tn_PortRoleInput, tn_PortTypeSpectrum},
+      {"semitone", tn_PortRoleOutput, tn_PortTypeScalar},
+      {"amplitude", tn_PortRoleOutput, tn_PortTypeScalar}
+                         },[](tn_State* state, unsigned long idx){
+      std::complex<float>* inbuf=(std::complex<float>*)tn_getPM(state->portState[0], idx).frequency_window.buffer;
+      double* semitone=tn_getPM(state->portState[1], idx).scalar.v;
+      double* amplitude=tn_getPM(state->portState[2], idx).scalar.v;
+      int fftElem=App::get().instreammanager.fftElem;
+      double semitones[12]={0};
+      InStreamManager& ism=App::get().instreammanager;
+      int sample_rate=ism.sample_rate;
+      for (int k = 1; k < fftElem; ++k) {
+        double fhz=sample_rate*k/(2.*(fftElem-1));
+        double n=12.0*log2(fhz/440);
+        double o=euclideanModulo(n,12);
+        int lower=(int)o;
+        int higher=(lower+1)%12;
+        double fracHigh=(double)o-lower;
+        double a=std::abs(inbuf[k]);
+        semitones[lower] +=(1.0-fracHigh)*a;
+        semitones[higher]+=     fracHigh *a;
+      }
+      int smax=0;
+      for (int i=1; i<12; i++) {
+        if(semitones[i]>semitones[smax]) {
+          smax=i;
+        }
+      }
+      *semitone=smax;
+      *amplitude=semitones[smax];
   });
 
   library.addProgramType("integral", {
