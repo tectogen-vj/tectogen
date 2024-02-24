@@ -176,15 +176,24 @@ int NodeWindow::show() {
 
           auto buffers=*n->getInstance().getBuffers();
           auto ring=buffers[oid].value().ring_ptr;
-          std::tuple<std::vector<tn_PortMessage>, size_t> accDesc={ring, ism.ringIdx};
-          ImGui::PlotLines("",[](void* data, int idx) -> float {
-              auto desc=(std::tuple<std::vector<tn_PortMessage>, size_t>*)data;
-              int startIdx=std::get<1>(*desc);
-              auto vec=std::get<0>(*desc);
-              int ringCount=vec.size();
-              return *vec[(startIdx+(ringCount-idx-1))%ringCount].scalar.v;
-            }, (void*)&accDesc
-                           ,ring.size(),0,nullptr,FLT_MAX,FLT_MAX,ImVec2(300,100));
+
+          if(node.second.getProgramDescriptor()->portDescriptors[0].type == tn_PortTypeScalar) {
+            std::tuple<std::vector<tn_PortMessage>, size_t> accDesc={ring, ism.ringIdx};
+            ImGui::PlotLines("",[](void* data, int idx) -> float {
+                auto desc=(std::tuple<std::vector<tn_PortMessage>, size_t>*)data;
+                int startIdx=std::get<1>(*desc);
+                auto vec=std::get<0>(*desc);
+                int ringCount=vec.size();
+                return *vec[(startIdx+(ringCount-idx-1))%ringCount].scalar.v;
+              }, (void*)&accDesc
+                             ,ring.size(),0,nullptr,FLT_MAX,FLT_MAX,ImVec2(300,100));
+          } else if (node.second.getProgramDescriptor()->portDescriptors[0].type == tn_PortTypeSpectrum) {
+            auto spectrum = (std::complex<float>*)ring[ism.ringIdx%ring.size()].frequency_window.buffer;
+            InStreamManager& ism=App::get().instreammanager;
+            auto nbins = ism.fftElem;
+            auto samplerate = ism.sample_rate;
+            ImGui::PlotSpectrum("", spectrum, nbins, samplerate, NULL, 0, FLT_MAX, ImVec2(300, 100));
+          }
 
         }
         ImNodes::EndInputAttribute();

@@ -40,6 +40,10 @@ void NodeProgramManager::loadTypes() {
       {"scalar", tn_PortRoleInput, tn_PortTypeScalar}
     },nullptr);
 
+  library.addProgramType(plotIdentifier, {
+      {"spectrum", tn_PortRoleInput, tn_PortTypeSpectrum}
+    },nullptr);
+
   library.addProgramType("FFT", {
       {"waveform", tn_PortRoleInput, tn_PortTypeSampleBlock},
       {"spectrum", tn_PortRoleOutput, tn_PortTypeSpectrum}
