@@ -141,7 +141,8 @@ void NodeProgramManager::loadTypes() {
       int fftElem=App::get().instreammanager.fftElem;
       double a=0;
       for (int k = 0; k < fftElem; ++k) {
-        a += std::abs(current[k])-std::abs(last[k]);
+        double d = std::abs(current[k])-std::abs(last[k]);
+        a += (d+std::abs(d))/2.0;
       }
       *outbuf=a;
   });
