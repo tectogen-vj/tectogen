@@ -182,7 +182,7 @@ int NodeWindow::show() {
               int startIdx=std::get<1>(*desc);
               auto vec=std::get<0>(*desc);
               int ringCount=vec.size();
-              return *vec[(startIdx+idx)%ringCount].scalar.v;
+              return *vec[(startIdx+(ringCount-idx-1))%ringCount].scalar.v;
             }, (void*)&accDesc
                            ,ring.size(),0,nullptr,FLT_MAX,FLT_MAX,ImVec2(300,100));
 
@@ -330,7 +330,7 @@ int NodeWindow::show() {
             int startIdx=std::get<1>(*desc);
             auto vec=std::get<0>(*desc);
             int ringCount=vec.size();
-            return *vec[(startIdx+idx)%ringCount].scalar.v;
+            return *vec[(startIdx+(ringCount-idx-1))%ringCount].scalar.v;
           }, (void*)&accDesc
                          ,ring.size(),0,nullptr,FLT_MAX,FLT_MAX,ImVec2(300,100));
         ImGui::EndTooltip();
