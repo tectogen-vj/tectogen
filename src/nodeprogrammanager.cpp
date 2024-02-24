@@ -155,6 +155,31 @@ void NodeProgramManager::loadTypes() {
       *outbuf=a;
   });
 
+  // flux a.k.a. spectrum energy
+  library.addProgramType("RCD", {
+      {"spectrum", tn_PortRoleInput, tn_PortTypeSpectrum},
+      {"odf", tn_PortRoleOutput, tn_PortTypeScalar}
+                         },[](tn_State* state, unsigned long idx){
+      std::complex<float>* current=(std::complex<float>*)tn_getPM(state->portState[0], idx  ).frequency_window.buffer;
+      std::complex<float>* last   =(std::complex<float>*)tn_getPM(state->portState[0], idx+1).frequency_window.buffer;
+      std::complex<float>* lastl   =(std::complex<float>*)tn_getPM(state->portState[0], idx+2).frequency_window.buffer;
+      double* outbuf=tn_getPM(state->portState[1], idx).scalar.v;
+      int fftElem=App::get().instreammanager.fftElem;
+      double a=0;
+      for (int k = 0; k < fftElem; ++k) {
+        double d=0;
+        if(std::abs(current[k])>=std::abs(last[k])) {
+          auto lastphase=std::arg(last[k]);
+          auto lastphasediff=lastphase-std::arg(lastl[k]);
+          lastphasediff += (lastphasediff>M_PI) ? -2*M_PI : (lastphasediff<=-M_PI) ? 2*M_PI : 0;
+          auto targetval=std::abs(last[k])*std::exp(lastphase+lastphasediff);
+          d = std::abs(current[k]-targetval);
+        }
+        a += d;
+      }
+      *outbuf=a;
+  });
+
   library.addProgramType("sum", {
       {"spectrum", tn_PortRoleInput, tn_PortTypeSpectrum},
       {"sum", tn_PortRoleOutput, tn_PortTypeScalar}
