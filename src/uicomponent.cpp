@@ -2,6 +2,7 @@
 
 #include "app.h"
 #include "config.h"
+#include "imnodes.h"
 #include "instreammanager.h"
 #include "logs.h"
 #include "ringbuffer.h"
@@ -39,7 +40,7 @@ int UIComponent::init() {
 
   IMGUI_CHECKVERSION();
   ImGuiContext& imContext = *ImGui::CreateContext();
-
+  ImNodes::CreateContext();
 
   Config::setHandler(imContext);
 
@@ -71,10 +72,9 @@ int UIComponent::init() {
   if (imContext.IO.IniFilename)
     ImGui::LoadIniSettingsFromDisk(imContext.IO.IniFilename);
 
+  applyTheme();
+
   initialRun = !imContext.SettingsLoaded;
-
-  ImGui::StyleColorsDark();
-
 
   ImGui_ImplGlfw_InitForOpenGL(context.window, true);
 
@@ -179,7 +179,17 @@ int UIComponent::tick() {
 #endif
       ImGui::EndMenu();
     }
-    ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetColorU32(ImVec4(0.6f, 0.9f, 0.6f, 1.0f)));
+    if (ImGui::BeginMenu("View")) {
+        if (ImGui::MenuItem("Light Mode", NULL, &Shaderaudio::Config::tectogenConf.lightMode)) {
+        applyTheme();
+        ImGui::MarkIniSettingsDirty();
+      }
+
+
+      ImGui::EndMenu();
+    }
+    ImGui::Separator();
+    ImGui::PushStyleColor(ImGuiCol_Text, console.infoCol);
     ImGui::Text("ui-fps:%3i\n",(int)ImGui::GetIO().Framerate);
 
     ImGui::PopStyleColor();
@@ -198,7 +208,7 @@ int UIComponent::tick() {
   glfwGetFramebufferSize(context.window, &display_w, &display_h);
   glViewport(0, 0, display_w, display_h);
 
-  glClearColor(0.2f, 0.2f, 0.2f, 1);
+  glClearColor(bgClearColor.Value.x,bgClearColor.Value.y,bgClearColor.Value.z, 1);
 
   glClear(GL_COLOR_BUFFER_BIT);
 
@@ -214,4 +224,19 @@ int UIComponent::tick() {
 int UIComponent::shutdown() {
   ImGui::Shutdown();
   return 0;
+}
+
+void UIComponent::applyTheme()
+{
+
+  if(Shaderaudio::Config::tectogenConf.lightMode) {
+    ImGui::StyleColorsLight();
+    ImNodes::StyleColorsLight();
+    console.colorsLight();
+  } else {
+    ImGui::StyleColorsDark();
+    ImNodes::StyleColorsDark();
+    console.colorsDark();
+  }
+  bgClearColor = ImGui::GetStyle().Colors[ImGuiCol_WindowBg];
 }

@@ -55,22 +55,22 @@ int Console::show() {
   while (clipper.Step()) {
     for (int i = clipper.DisplayStart; i < clipper.DisplayEnd; i++) {
       const LogEntry entry = logs.getline(i);
-      ImVec4 color;
+      ImGuiCol color;
       switch (entry.severity) {
         case logSeverity_Err:
-          color = ImVec4(1.0f, 0.4f, 0.4f, 1.0f);
+          color = errCol;
           break;
         case logSeverity_Warn:
-          color = ImVec4(0.9f, 0.9f, 0.4f, 1.0f);
+          color = warnCol;
           break;
         case logSeverity_Info:
-          color = ImVec4(0.6f, 0.9f, 0.6f, 1.0f);
+          color = infoCol;
           break;
         case logSeverity_Debug:
-          color = ImVec4(0.6f, 0.6f, 0.6f, 1.0f);
+          color = debugCol;
           break;
         default:
-          color = ImVec4(1.0f, 0.0f, 0.4f, 1.0f);
+          color = defaultCol;
       }
 
       ImGui::PushStyleColor(ImGuiCol_Text, color);
@@ -91,4 +91,25 @@ int Console::show() {
   ImGui::End();
   //ImGui::PopStyleColor(2);
   return 0;
+}
+
+void Console::colorsDark()
+{
+
+  errCol     = ImColor::HSV(0.0f, 0.6f, 1.0f, 1.0f);
+  warnCol    = ImColor::HSV(0.15f, 0.6f, 0.9f, 1.0f);
+  infoCol    = ImColor::HSV(0.6f, 0.3f, 0.9f, 1.0f);
+  debugCol   = ImColor::HSV(0.0f, 0.0f, 0.6f, 1.0f);
+  defaultCol = ImColor::HSV(0.9f, 1.0f, 1.0f, 1.0f);
+}
+
+void Console::colorsLight()
+{
+
+  errCol     = ImColor::HSV(0.0f, 1.0f, 0.6f, 1.0f);
+  warnCol    = ImColor::HSV(0.15f, 1.0f, 0.6f, 1.0f);
+  infoCol    = ImColor::HSV(0.6f, 1.0f, 0.6f, 1.0f);
+  debugCol   = ImColor::HSV(0.0f, 0.0f, 0.6f, 1.0f);
+  defaultCol = ImColor::HSV(0.9f, 1.0f, 1.0f, 1.0f);
+
 }

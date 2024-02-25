@@ -14,11 +14,14 @@
 
 class UIComponent
 {
+private:
+  ImColor bgClearColor={0.2f, 0.2f, 0.2f,1.0f};
  public:
   UIComponent();
   int init();
   int tick();
   int shutdown();
+  void applyTheme();
   Context context;
   bool initialRun = false;
   bool shouldClose = false;

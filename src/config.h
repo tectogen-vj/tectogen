@@ -27,6 +27,7 @@ struct TectogenConf {
   std::string deviceName{};
   int samplerate{};
   std::string layoutName{};
+  bool lightMode{};
 };
 extern TectogenConf tectogenConf;
 }
@@ -35,7 +36,8 @@ VISITABLE_STRUCT(Shaderaudio::Config::TectogenConf,
   backendName,
   deviceName,
   samplerate,
-  layoutName
+  layoutName,
+  lightMode
 );
 #endif
 

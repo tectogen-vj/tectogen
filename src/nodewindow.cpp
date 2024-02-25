@@ -17,9 +17,9 @@
 NodeWindow::NodeWindow() {}
 
 int NodeWindow::init() {
-  ImNodes::CreateContext();
   ImNodes::SetNodeGridSpacePos(-1, ImVec2(200.0f, 200.0f));
   ImNodes::SetNodeGridSpacePos(-2, ImVec2(400.0f, 400.0f));
+
 
   NodeProgramManager& npm=App::get().nodemanager;
   npm.loadTypes();
