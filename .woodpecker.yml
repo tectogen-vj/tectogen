@@ -14,11 +14,11 @@ steps:
   build:
     image: codeberg.org/tectogen/build-old-ubuntu:latest
     commands:
-      - cmake -Btectogen-linux
+      - cmake -Btectogen-linux -DCMAKE_BUILD_TYPE=RelWithDebInfo
       - cmake --build tectogen-linux
       - patchelf --replace-needed libGLEW.so.2.1 libGLEW.so tectogen-linux/bin/tectogen # https://abi-laboratory.pro/index.php?view=objects_report&l=glew&v1=2.1.0&v2=2.2.0
       - tar czvf tectogen-linux.tar.gz tectogen-linux/bin tectogen-linux/share
-      - PATH="/mxe/usr/bin/:$PATH" x86_64-w64-mingw32.static-cmake -Btectogen-windows
+      - PATH="/mxe/usr/bin/:$PATH" x86_64-w64-mingw32.static-cmake -Btectogen-windows -DCMAKE_BUILD_TYPE=RelWithDebInfo
       - PATH="/mxe/usr/bin/:$PATH" x86_64-w64-mingw32.static-cmake --build tectogen-windows
       - 7z a -tzip tectogen-windows.zip tectogen-windows/bin tectogen-windows/share
   publish:
