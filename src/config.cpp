@@ -22,8 +22,10 @@ TectogenConf tectogenConf;
 
 inline std::string cstr(std::string s) {return s;};
 inline std::string cstr(int i) {return std::to_string(i);};
+inline std::string cstr(bool b) {return b?"true":"false";};
 inline void set(std::string& t, const std::string s) {t=s;};
 inline void set(int& t, const std::string s){t=std::stoi(s);};
+inline void set(bool& t, const std::string s){t=(s.compare("true")==0);};
 
 void WriteAll(ImGuiContext *ctx, ImGuiSettingsHandler *handler, ImGuiTextBuffer *buf) {
   buf->appendf("[%s][TectogenConf]\n", handler->TypeName);
