@@ -164,7 +164,9 @@ std::vector<NodeProgramType> NodeProgramLibrary::getPrograms() {
   std::vector<NodeProgramType> programs;
   programs.reserve(lib.size());
   for (auto& entry : lib) {
-    programs.push_back(entry.programType);
+    if(entry.metadata->type!=NodeProgramMetadata::Type::None) {
+      programs.push_back(entry.programType);
+    }
   }
 
   return programs;

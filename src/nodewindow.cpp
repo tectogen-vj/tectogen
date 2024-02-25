@@ -164,37 +164,38 @@ int NodeWindow::show() {
         }
       }
 
-      if(node.second.getProgramType().desc->identifier==npm.plotIdentifier) {
-        ImNodes::PushColorStyle(ImNodesCol_Pin, ImColor::HSV(0.58,0.79,1,0.7));
-        ImNodes::PushColorStyle(ImNodesCol_PinHovered, ImColor::HSV(0.58,0.79,1,1));
-        ImNodes::PushAttributeFlag(ImNodesAttributeFlags_EnableLinkDetachWithDragClick);
-        ImNodes::BeginInputAttribute(node.second.id+1);
-        if(node.second.in[0]->source) {
-          Node* n=node.second.in[0]->source->source;
-          int oid=node.second.in[0]->source->id-n->id-1;
-          InStreamManager& ism=App::get().instreammanager;
-
-          auto buffers=*n->getInstance().getBuffers();
-          auto ring=buffers[oid].value().ring_ptr;
-
-          if(node.second.getProgramDescriptor()->portDescriptors[0].type == tn_PortTypeScalar) {
-            std::tuple<std::vector<tn_PortMessage>, size_t> accDesc={ring, ism.ringIdx};
-            ImGui::PlotLines("",[](void* data, int idx) -> float {
-                auto desc=(std::tuple<std::vector<tn_PortMessage>, size_t>*)data;
-                int startIdx=std::get<1>(*desc);
-                auto vec=std::get<0>(*desc);
-                int ringCount=vec.size();
-                return *vec[(startIdx+(ringCount-idx-1))%ringCount].scalar.v;
-              }, (void*)&accDesc
-                             ,ring.size(),0,nullptr,FLT_MAX,FLT_MAX,ImVec2(300,100));
-          } else if (node.second.getProgramDescriptor()->portDescriptors[0].type == tn_PortTypeSpectrum) {
-            auto spectrum = (std::complex<float>*)ring[ism.ringIdx%ring.size()].frequency_window.buffer;
+      if(node.second.getProgramType().meta->type==NodeProgramMetadata::Type::None) {
+        if(node.second.getProgramType().desc->identifier==npm.plotIdentifier) {
+          ImNodes::PushColorStyle(ImNodesCol_Pin, ImColor::HSV(0.58,0.79,1,0.7));
+          ImNodes::PushColorStyle(ImNodesCol_PinHovered, ImColor::HSV(0.58,0.79,1,1));
+          ImNodes::PushAttributeFlag(ImNodesAttributeFlags_EnableLinkDetachWithDragClick);
+          ImNodes::BeginInputAttribute(node.second.id+1);
+          if(node.second.in[0]->source) {
+            Node* n=node.second.in[0]->source->source;
+            int oid=node.second.in[0]->source->id-n->id-1;
             InStreamManager& ism=App::get().instreammanager;
-            auto nbins = ism.fftElem;
-            auto samplerate = ism.sample_rate;
-            ImGui::PlotSpectrum("", spectrum, nbins, samplerate, NULL, 0, FLT_MAX, ImVec2(300, 100));
-          }
 
+            auto buffers=*n->getInstance().getBuffers();
+            auto ring=buffers[oid].value().ring_ptr;
+
+            if(node.second.getProgramDescriptor()->portDescriptors[0].type == tn_PortTypeScalar) {
+              std::tuple<std::vector<tn_PortMessage>, size_t> accDesc={ring, ism.ringIdx};
+              ImGui::PlotLines("",[](void* data, int idx) -> float {
+                  auto desc=(std::tuple<std::vector<tn_PortMessage>, size_t>*)data;
+                  int startIdx=std::get<1>(*desc);
+                  auto vec=std::get<0>(*desc);
+                  int ringCount=vec.size();
+                  return *vec[(startIdx+(ringCount-idx-1))%ringCount].scalar.v;
+                }, (void*)&accDesc
+                               ,ring.size(),0,nullptr,FLT_MAX,FLT_MAX,ImVec2(300,100));
+            } else if (node.second.getProgramDescriptor()->portDescriptors[0].type == tn_PortTypeSpectrum) {
+              auto spectrum = (std::complex<float>*)ring[ism.ringIdx%ring.size()].frequency_window.buffer;
+              InStreamManager& ism=App::get().instreammanager;
+              auto nbins = ism.fftElem;
+              auto samplerate = ism.sample_rate;
+              ImGui::PlotSpectrum("", spectrum, nbins, samplerate, NULL, 0, 30, ImVec2(300, 100));
+            }
+          }
         }
         ImNodes::EndInputAttribute();
         ImNodes::PopAttributeFlag();
