@@ -57,7 +57,6 @@ typedef struct tn_PortDescriptor {
 } tn_PortDescriptor;
 
 typedef struct tn_PortState {
-  void** payload_symbol_to_be_obsoleted;
   tn_PortBuffer portData;
 } tn_PortState;
 

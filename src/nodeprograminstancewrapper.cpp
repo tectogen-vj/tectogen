@@ -28,15 +28,12 @@ NodeProgramInstanceWrapper::M::M(const Node &node) :
       if(portdesc.type==tn_PortTypeSampleBlock) {
         size_t bufsize=App::get().instreammanager.blocksize*sizeof(float);
         buffers[i].emplace(MultiBuffer{bufsize, lookbackFrames});
-        state.portState[i].payload_symbol_to_be_obsoleted=buffers.back()->getWrite();
       } else if(portdesc.type==tn_PortTypeSpectrum) {
         size_t bufsize=App::get().instreammanager.fftAlign;
         buffers[i].emplace(MultiBuffer{bufsize, lookbackFrames});
-        state.portState[i].payload_symbol_to_be_obsoleted=buffers.back()->getWrite();
       } else if(portdesc.type==tn_PortTypeScalar) {
         size_t bufsize=sizeof(double);
         buffers[i].emplace(MultiBuffer{bufsize, lookbackFrames});
-        state.portState[i].payload_symbol_to_be_obsoleted=buffers.back()->getWrite();
       }
       NodeOutput& output=ng.nodeOutputs.at(node.id+i+1);
     } else if (portdesc.role==tn_PortRoleInput) {
@@ -64,10 +61,6 @@ NodeProgramInstanceWrapper::M::M(M &&a) noexcept :
   portStateArr(a.portStateArr),
   state({.portState=portStateArr.data(),.userdata=nullptr,.descriptor=node.getProgramDescriptor(),.instanceId=node.id})
 {
-  for(int i=0; i<descriptor->portCount; i++) {
-    state.portState[i].payload_symbol_to_be_obsoleted=a.state.portState[i].payload_symbol_to_be_obsoleted;
-    a.state.portState[i].payload_symbol_to_be_obsoleted=nullptr;
-  }
 }
 
 void NodeProgramInstanceWrapper::M::linkBuffers()
@@ -84,12 +77,8 @@ void NodeProgramInstanceWrapper::M::linkBuffers()
         // FIXME: value none coredump when connecting shader with shader
         // FIXME: STYLE: split this up, add intermediates and methods to the Node* classes
         MultiBuffer& sourceNodeOutputBuffer=sourceNode->getInstance().m->buffers[source->id-source->source->id-1].value();
-        state.portState[i].payload_symbol_to_be_obsoleted=sourceNodeOutputBuffer.getWrite();
-
         state.portState[i].portData.ring_buffer=sourceNodeOutputBuffer.ring_ptr.data();
       } else {
-        state.portState[i].payload_symbol_to_be_obsoleted=nullptr;
-
         state.portState[i].portData.ring_buffer=nullptr;
       }
     }
