@@ -18,7 +18,7 @@
 namespace Shaderaudio::Config {
 
 std::map<std::string, std::string> kv;
-Audio audio;
+TectogenConf tectogenConf;
 
 inline std::string cstr(std::string s) {return s;};
 inline std::string cstr(int i) {return std::to_string(i);};
@@ -26,8 +26,8 @@ inline void set(std::string& t, const std::string s) {t=s;};
 inline void set(int& t, const std::string s){t=std::stoi(s);};
 
 void WriteAll(ImGuiContext *ctx, ImGuiSettingsHandler *handler, ImGuiTextBuffer *buf) {
-  buf->appendf("[%s][Audio]\n", handler->TypeName);
-  visit_struct::for_each(audio, [&buf](const char * name, const auto & value) {
+  buf->appendf("[%s][TectogenConf]\n", handler->TypeName);
+  visit_struct::for_each(tectogenConf, [&buf](const char * name, const auto & value) {
     buf->appendf("%s=%s\n", name, cstr(value).c_str());
   });
   buf->appendf("\n");
@@ -36,7 +36,7 @@ void WriteAll(ImGuiContext *ctx, ImGuiSettingsHandler *handler, ImGuiTextBuffer 
 void *ReadOpen(ImGuiContext *, ImGuiSettingsHandler *, const char *name)
 {
   {
-    if (strcmp(name, "Audio") != 0) {
+    if (strcmp(name, "TectogenConf") != 0) {
       return NULL;
     }
     return (void*)1; // HACK
@@ -61,7 +61,7 @@ void ReadLine(ImGuiContext *ctx, ImGuiSettingsHandler *, void *, const char *lin
 void ApplyAll(ImGuiContext* ctx, ImGuiSettingsHandler*)
 {
   Logs::get().log(logSeverity_Warn, "UI", "ini handler ApplyAllFn Stub");
-  visit_struct::for_each(audio, [](const char * name, auto & value) {
+  visit_struct::for_each(tectogenConf, [](const char * name, auto & value) {
     const auto& v=kv.find(name);
     if(v!=kv.end()) {
       set(value, v->second);

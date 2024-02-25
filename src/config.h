@@ -22,16 +22,16 @@ void ApplyAll(ImGuiContext* ctx, ImGuiSettingsHandler*);
 
 void setHandler(ImGuiContext& context);
 
-struct Audio {
+struct TectogenConf {
   std::string backendName{};
   std::string deviceName{};
   int samplerate{};
   std::string layoutName{};
 };
-extern Audio audio;
+extern TectogenConf tectogenConf;
 }
 #ifdef CONFIG_IMPL
-VISITABLE_STRUCT(Shaderaudio::Config::Audio,
+VISITABLE_STRUCT(Shaderaudio::Config::TectogenConf,
   backendName,
   deviceName,
   samplerate,

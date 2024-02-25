@@ -45,16 +45,16 @@ int AudioConfigWindow::init() {
         Logs::get().logf(logSeverity_Err, "SoundIO", "Error %i: %s", err);
       };
       apis.push_back(api);
-      if(Shaderaudio::Config::audio.backendName==soundio_backend_name(api->current_backend)) {
+      if(Shaderaudio::Config::tectogenConf.backendName==soundio_backend_name(api->current_backend)) {
         soundio_flush_events(api);
         int const inputCount = soundio_input_device_count(api);
         for (int deviceID = 0; deviceID < inputCount; deviceID += 1) {
           SoundIoDevice* device = soundio_get_input_device(api, deviceID);
           if (device){
-            if(Shaderaudio::Config::audio.deviceName==device->name && Shaderaudio::Config::audio.samplerate) {
+              if(Shaderaudio::Config::tectogenConf.deviceName==device->name && Shaderaudio::Config::tectogenConf.samplerate) {
               iSelect=api->current_backend;
               dSelect=device;
-              sampleRate=Shaderaudio::Config::audio.samplerate;
+              sampleRate=Shaderaudio::Config::tectogenConf.samplerate;
               // TODO check if requested rate is supported, layout!
               openSelected();
             }
@@ -208,9 +208,9 @@ int AudioConfigWindow::show() {
       ImGui::SameLine();
       if(ImGui::Button("set default")) {
         Logs::get().log(logSeverity_Warn, "UI", "STUB!");
-        Shaderaudio::Config::audio.samplerate=sampleRate;
-        Shaderaudio::Config::audio.backendName=soundio_backend_name(iSelect);
-        Shaderaudio::Config::audio.deviceName=dSelect->name;
+        Shaderaudio::Config::tectogenConf.samplerate=sampleRate;
+        Shaderaudio::Config::tectogenConf.backendName=soundio_backend_name(iSelect);
+        Shaderaudio::Config::tectogenConf.deviceName=dSelect->name;
         ImGui::MarkIniSettingsDirty();
       }
     }
