@@ -186,6 +186,8 @@ void InStreamManager::analysisThreadFunc() {
  * @brief Callback thread for audio smples as documented for soundio
  */
 void InStreamManager::soundio_read_callback(SoundIoInStream* instream, int frame_count_min, int frame_count_max) {
+  Monitoring::monitor(frame_count_min, "frame count min");
+  Monitoring::monitor(frame_count_max, "frame count max");
   InStreamManager* t=(InStreamManager*)instream->userdata;
   t->running=true;
 
