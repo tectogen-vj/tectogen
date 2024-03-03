@@ -213,6 +213,11 @@ int AudioConfigWindow::show() {
         Shaderaudio::Config::tectogenConf.deviceName=dSelect->name;
         ImGui::MarkIniSettingsDirty();
       }
+      ImGui::SameLine();
+      if(ImGui::Button("clear default")) {
+        Shaderaudio::Config::tectogenConf.deviceName="";
+        ImGui::MarkIniSettingsDirty();
+      }
     }
   }
   ImGui::End();
