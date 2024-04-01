@@ -83,6 +83,29 @@ void NodeProgramManager::loadTypes() {
     }
   });
 
+  library.addProgramType("A-Weight", {
+      {"raw spectrum", tn_PortRoleInput, tn_PortTypeSpectrum},
+      {"eq spectrum", tn_PortRoleOutput, tn_PortTypeSpectrum}
+                         },[](tn_State* state, unsigned long idx){
+    std::complex<float>* inbuf =(std::complex<float>*)tn_getPM(state->portState[0], idx).frequency_window.buffer;
+    std::complex<float>* outbuf=(std::complex<float>*)tn_getPM(state->portState[1], idx).frequency_window.buffer;
+
+    InStreamManager& ism=App::get().instreammanager;
+    const int fftElem=ism.fftElem;
+
+    for (int k = 0; k < fftElem; ++k) {
+      const float fac1khz=0.7943411775965269; // factor at 1kHz for normalization
+      const float p1=12194.217*12194.217;
+      const float p2=20.598997*20.598997;
+      const float p3=107.65265*107.65265;
+      const float p4=737.86223*737.86223;
+      float f=ism.sample_rate*k/(2.*(fftElem-1));
+      float fac=(p1 * pow(f,4)) / ((f*f + p2) * sqrt((f*f + p3) * (f*f + p4)) * (f*f + p1));
+      // fac/=fac1khz; << skip normalization to avoid clipping!
+      outbuf[k]=inbuf[k] * fac;
+    }
+  });
+
   library.addProgramType("Harmonic-Percussive-Separation", {
       {"input", tn_PortRoleInput, tn_PortTypeSpectrum},
       {"harmonic", tn_PortRoleOutput, tn_PortTypeSpectrum},
